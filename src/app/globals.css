@@ -59,13 +59,13 @@
 }
 
 :root {
-  /* GiveTrail brand — warm cream / blush / dusty rose / peach / mauve, from the GT mark */
-  --trail-cream: #fbf5ee;
-  --trail-blush: #f6ddd2;
-  --trail-rose: #c17a6f;
-  --trail-peach: #e8b48f;
-  --trail-mauve: #a97f95;
-  --trail-brown: #6b4f42;
+  /* GiveTrail brand — sampled directly from the GT ribbon mark (cream / blush / dusty rose / peach / mauve-brown) */
+  --trail-cream: #fdf7f1;
+  --trail-blush: #f3d3c4;
+  --trail-rose: #c48d86;
+  --trail-peach: #e7ad8c;
+  --trail-mauve: #9c7269;
+  --trail-brown: #5c3f34;
 
   --background: #fbf6f0;
   --foreground: #2a211c;
@@ -73,13 +73,13 @@
   --card-foreground: #2a211c;
   --popover: #ffffff;
   --popover-foreground: #2a211c;
-  --primary: #b3645a;
+  --primary: #b17862;
   --primary-foreground: #fdf6f2;
-  --secondary: #f0dccb;
+  --secondary: #f2ddc9;
   --secondary-foreground: #4a3527;
-  --muted: #f2e9e0;
+  --muted: #f3ebe1;
   --muted-foreground: #83766c;
-  --accent: #f5ded2;
+  --accent: #f2d7c8;
   --accent-foreground: #4a2e28;
   --destructive: #af4438;
   --success: #4d7a5f;
@@ -88,30 +88,30 @@
   --warning-foreground: #fbf3e8;
   --border: #e9ddd0;
   --input: #e9ddd0;
-  --ring: #c58c7c;
-  --chart-1: #b3645a;
-  --chart-2: #d89a72;
-  --chart-3: #a97f95;
-  --chart-4: #6b4f42;
-  --chart-5: #e3b7a0;
+  --ring: #c99483;
+  --chart-1: #b17862;
+  --chart-2: #e0a97e;
+  --chart-3: #9c7269;
+  --chart-4: #5c3f34;
+  --chart-5: #eec2ab;
   --radius: 1rem;
   --sidebar: #f7efe6;
   --sidebar-foreground: #2a211c;
-  --sidebar-primary: #b3645a;
+  --sidebar-primary: #b17862;
   --sidebar-primary-foreground: #fdf6f2;
-  --sidebar-accent: #f0dccb;
+  --sidebar-accent: #f2ddc9;
   --sidebar-accent-foreground: #4a3527;
   --sidebar-border: #e9ddd0;
-  --sidebar-ring: #c58c7c;
+  --sidebar-ring: #c99483;
 }
 
 .dark {
   --trail-cream: #2a211c;
   --trail-blush: #3c2e28;
-  --trail-rose: #d68f83;
+  --trail-rose: #d6a196;
   --trail-peach: #e0aa80;
-  --trail-mauve: #bc93a8;
-  --trail-brown: #cbb2a2;
+  --trail-mauve: #b78f83;
+  --trail-brown: #d9beae;
 
   --background: #211a16;
   --foreground: #f3e9df;
@@ -119,7 +119,7 @@
   --card-foreground: #f3e9df;
   --popover: #291f1a;
   --popover-foreground: #f3e9df;
-  --primary: #d68f83;
+  --primary: #d19c85;
   --primary-foreground: #241a16;
   --secondary: #3a2c24;
   --secondary-foreground: #f3e9df;
@@ -134,20 +134,20 @@
   --warning-foreground: #2b2010;
   --border: rgba(243, 233, 223, 0.12);
   --input: rgba(243, 233, 223, 0.14);
-  --ring: #bc7f70;
-  --chart-1: #d68f83;
+  --ring: #c99483;
+  --chart-1: #d19c85;
   --chart-2: #e0aa80;
-  --chart-3: #bc93a8;
-  --chart-4: #cbb2a2;
+  --chart-3: #b78f83;
+  --chart-4: #d9beae;
   --chart-5: #f0c6ac;
   --sidebar: #241b17;
   --sidebar-foreground: #f3e9df;
-  --sidebar-primary: #d68f83;
+  --sidebar-primary: #d19c85;
   --sidebar-primary-foreground: #241a16;
   --sidebar-accent: #3a2c24;
   --sidebar-accent-foreground: #f3e9df;
   --sidebar-border: rgba(243, 233, 223, 0.12);
-  --sidebar-ring: #bc7f70;
+  --sidebar-ring: #c99483;
 }
 
 @layer base {
