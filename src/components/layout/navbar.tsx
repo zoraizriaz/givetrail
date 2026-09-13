@@ -8,9 +8,9 @@ import { Button } from "@/components/ui/button";
 import { AccountMenu } from "@/components/layout/account-menu";
 
 const NAV_LINKS = [
-  { href: "/explore", label: "Explore" },
+  { href: "/explore", label: "Explore", tourId: "nav-explore" },
   { href: "/how-it-works", label: "How It Works" },
-  { href: "/for-organizations", label: "For Organizations" },
+  { href: "/for-organizations", label: "For Organizations", tourId: "nav-for-organizations" },
   { href: "/for-companies", label: "For Companies" },
 ];
 
@@ -27,12 +27,14 @@ export function Navbar() {
         <nav className="hidden items-center gap-1 md:flex">
           {NAV_LINKS.map((link) => (
             <Button key={link.href} asChild variant="ghost" size="sm" className="text-sm text-foreground/80">
-              <Link href={link.href}>{link.label}</Link>
+              <Link href={link.href} data-tour={link.tourId}>
+                {link.label}
+              </Link>
             </Button>
           ))}
         </nav>
 
-        <div className="hidden items-center gap-2 md:flex">
+        <div className="hidden items-center gap-2 md:flex" data-tour="account-menu">
           <AccountMenu />
         </div>
 

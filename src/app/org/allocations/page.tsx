@@ -12,6 +12,8 @@ import { toMinorUnits } from "@/lib/utils/currency";
 import { toast } from "sonner";
 import type { Currency } from "@/lib/types";
 import { persistAllocationOverride } from "@/lib/runtime-overrides";
+import { PageTour } from "@/components/tour/page-tour";
+import { orgAllocationsTourSteps } from "@/components/tour/steps";
 
 export default function OrgAllocationsPage() {
   const { organizationId } = useCurrentUser();
@@ -65,7 +67,7 @@ export default function OrgAllocationsPage() {
         />
       ) : (
         <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_1.4fr]">
-          <div className="space-y-2">
+          <div className="space-y-2" data-tour="org-allocation-list">
             {expenses.map((e) => (
               <button
                 key={e.id}
@@ -88,7 +90,7 @@ export default function OrgAllocationsPage() {
           </div>
 
           {selected && (
-            <div className="rounded-2xl border border-border bg-card p-6 trail-card-shadow">
+            <div className="rounded-2xl border border-border bg-card p-6 trail-card-shadow" data-tour="org-allocation-panel">
               <div className="flex items-center justify-between">
                 <h2 className="font-heading text-lg font-semibold text-foreground">{selected.title}</h2>
                 <Money amount={needed} currency={selected.currency} className="font-semibold text-foreground" />
@@ -135,6 +137,7 @@ export default function OrgAllocationsPage() {
           )}
         </div>
       )}
+      <PageTour tourId="org-allocations" steps={orgAllocationsTourSteps} />
     </div>
   );
 }

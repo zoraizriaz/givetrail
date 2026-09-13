@@ -10,6 +10,8 @@ import { StatCard } from "@/components/shared/stat-card";
 import { DonationCard } from "@/components/donor/donation-card";
 import { EmptyState } from "@/components/shared/empty-state";
 import { Button } from "@/components/ui/button";
+import { PageTour } from "@/components/tour/page-tour";
+import { donorDashboardTourSteps } from "@/components/tour/steps";
 
 export default function DonorDashboardPage() {
   const { user, isReady } = useCurrentUser();
@@ -48,20 +50,20 @@ export default function DonorDashboardPage() {
         <p className="text-sm text-muted-foreground">Here&rsquo;s everything you&rsquo;ve given and where it stands.</p>
       </div>
 
-      <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4" data-tour="donor-stats">
         <StatCard label="Total lifetime giving" value={fmt(dashboard.totalLifetimeGiving, dashboard.currency)} icon={HandHeart} />
         <StatCard label="Organizations supported" value={String(dashboard.organizationsSupportedCount)} icon={Landmark} />
         <StatCard label="Campaigns supported" value={String(dashboard.campaignsSupportedCount)} icon={Route} />
         <StatCard label="Fully documented donations" value={String(dashboard.fullyDocumentedDonationsCount)} icon={ShieldCheck} />
       </div>
 
-      <div className="mt-4 grid gap-4 sm:grid-cols-3">
+      <div className="mt-4 grid gap-4 sm:grid-cols-3" data-tour="donor-allocation-summary">
         <StatCard label="Fully allocated" value={fmt(dashboard.amountFullyAllocated, dashboard.currency)} tone="success" />
         <StatCard label="Currently being utilized" value={fmt(dashboard.amountBeingUtilized, dashboard.currency)} tone="warning" />
         <StatCard label="Awaiting allocation" value={fmt(dashboard.amountAwaitingAllocation, dashboard.currency)} />
       </div>
 
-      <div className="mt-10">
+      <div className="mt-10" data-tour="donor-donations-list">
         <div className="flex items-center justify-between">
           <h2 className="font-heading text-lg font-semibold text-foreground">Your donations</h2>
           <Button asChild variant="outline" size="sm">
@@ -89,6 +91,7 @@ export default function DonorDashboardPage() {
           </div>
         )}
       </div>
+      <PageTour tourId="donor-dashboard" steps={donorDashboardTourSteps} />
     </div>
   );
 }

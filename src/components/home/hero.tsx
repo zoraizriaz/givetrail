@@ -22,7 +22,7 @@ export function Hero() {
             Every donation leaves a trail.
           </p>
           <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <Button asChild size="lg" className="gap-2">
+            <Button asChild size="lg" className="gap-2" data-tour="hero-explore-cta">
               <Link href="/explore">
                 Explore Causes <ArrowRight className="size-4" />
               </Link>
@@ -33,7 +33,7 @@ export function Hero() {
           </div>
         </div>
 
-        <div className="mx-auto mt-16 max-w-4xl">
+        <div className="mx-auto mt-16 max-w-4xl" data-tour="hero-trail-visual">
           <HomeTrailVisual
             currency={trail.donation.currency}
             grossAmount={trail.donation.grossAmount}

@@ -16,6 +16,8 @@ import { initials } from "@/lib/utils/format";
 import { getOrgPublicProfile } from "@/lib/data";
 import { applyRuntimeOverrides } from "@/lib/runtime-overrides";
 import { useMounted } from "@/lib/use-mounted";
+import { PageTour } from "@/components/tour/page-tour";
+import { orgProfileTourSteps } from "@/components/tour/steps";
 import { Landmark } from "lucide-react";
 
 export default function OrganizationProfilePage({ params }: { params: Promise<{ slug: string }> }) {
@@ -57,7 +59,7 @@ export default function OrganizationProfilePage({ params }: { params: Promise<{ 
               </div>
             </div>
             {isVerified ? (
-              <Button asChild size="lg" className="shrink-0">
+              <Button asChild size="lg" className="shrink-0" data-tour="org-profile-donate">
                 <Link href={`/donate/checkout/${organization.slug}`}>Donate to {organization.name.split(" ")[0]}</Link>
               </Button>
             ) : (
@@ -134,7 +136,7 @@ export default function OrganizationProfilePage({ params }: { params: Promise<{ 
           </div>
 
           <aside className="space-y-6">
-            <div className="rounded-2xl border border-border bg-card p-6 trail-card-shadow">
+            <div className="rounded-2xl border border-border bg-card p-6 trail-card-shadow" data-tour="org-profile-transparency">
               <h3 className="font-heading text-base font-semibold text-foreground">Transparency</h3>
               <div className="mt-4 space-y-3">
                 {[
@@ -158,7 +160,7 @@ export default function OrganizationProfilePage({ params }: { params: Promise<{ 
               </div>
             </div>
 
-            <div className="rounded-2xl border border-border bg-card p-6 trail-card-shadow">
+            <div className="rounded-2xl border border-border bg-card p-6 trail-card-shadow" data-tour="org-profile-allocation-policy">
               <h3 className="font-heading text-base font-semibold text-foreground">How funds are allocated</h3>
               <p className="mt-1 text-xs text-muted-foreground">Disclosed by {organization.name}, shown before you donate.</p>
               <div className="mt-4">
@@ -200,6 +202,7 @@ export default function OrganizationProfilePage({ params }: { params: Promise<{ 
           </aside>
         </div>
       </div>
+      <PageTour tourId="org-profile" steps={orgProfileTourSteps} />
     </div>
   );
 }

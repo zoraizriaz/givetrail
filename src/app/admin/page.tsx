@@ -7,6 +7,8 @@ import { StatCard } from "@/components/shared/stat-card";
 import { MiniBarChart } from "@/components/shared/mini-bar-chart";
 import { OrgVerificationBadge } from "@/components/shared/verification-badge";
 import { formatMoney } from "@/lib/utils/currency";
+import { PageTour } from "@/components/tour/page-tour";
+import { adminDashboardTourSteps } from "@/components/tour/steps";
 
 export default function AdminDashboardPage() {
   const analytics = getAdminAnalytics();
@@ -17,7 +19,7 @@ export default function AdminDashboardPage() {
       <h1 className="font-heading text-2xl font-semibold text-foreground">Platform Overview</h1>
       <p className="text-sm text-muted-foreground">GiveTrail-wide analytics across every organization and donor.</p>
 
-      <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4" data-tour="admin-stats">
         <StatCard label="Total donation volume" value={formatMoney(analytics.totalDonationVolumeUSD, "USD", { compact: true })} icon={Banknote} />
         <StatCard label="GiveTrail revenue" value={formatMoney(analytics.platformRevenueUSD, "USD")} icon={TrendingUp} />
         <StatCard label="NGOs onboarded" value={String(analytics.ngoCount)} icon={Landmark} />
@@ -47,7 +49,7 @@ export default function AdminDashboardPage() {
         </div>
       </div>
 
-      <div className="mt-10">
+      <div className="mt-10" data-tour="admin-verification-queue">
         <div className="flex items-center justify-between">
           <h2 className="font-heading text-lg font-semibold text-foreground">Verification queue</h2>
           <Link href="/admin/ngos" className="text-sm font-medium text-primary hover:underline">
@@ -74,6 +76,7 @@ export default function AdminDashboardPage() {
           )}
         </div>
       </div>
+      <PageTour tourId="admin-dashboard" steps={adminDashboardTourSteps} />
     </div>
   );
 }

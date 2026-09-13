@@ -12,6 +12,8 @@ import { Money } from "@/components/shared/money";
 import { VerificationLevelBadge } from "@/components/shared/verification-badge";
 import { EmptyState } from "@/components/shared/empty-state";
 import { formatDateShort } from "@/lib/utils/format";
+import { PageTour } from "@/components/tour/page-tour";
+import { orgExpensesTourSteps } from "@/components/tour/steps";
 import type { Expense, VerificationLevel } from "@/lib/types";
 
 function OrgExpensesInner() {
@@ -36,7 +38,7 @@ function OrgExpensesInner() {
           <h1 className="font-heading text-2xl font-semibold text-foreground">Expenses</h1>
           <p className="text-sm text-muted-foreground">Record expenditures and manage supporting evidence.</p>
         </div>
-        <Button asChild className="gap-1.5">
+        <Button asChild className="gap-1.5" data-tour="org-new-expense">
           <Link href="/org/expenses/new">
             <Plus className="size-4" /> New Expense
           </Link>
@@ -46,7 +48,7 @@ function OrgExpensesInner() {
       {filtered.length === 0 ? (
         <EmptyState className="mt-8" icon={Receipt} title="No expenses yet" description="Record your first expenditure to start building your transparency record." />
       ) : (
-        <div className="mt-8 overflow-x-auto rounded-2xl border border-border bg-card">
+        <div className="mt-8 overflow-x-auto rounded-2xl border border-border bg-card" data-tour="org-expenses-table">
           <table className="w-full text-sm">
             <thead className="border-b border-border text-left text-xs text-muted-foreground">
               <tr>
@@ -82,6 +84,7 @@ function OrgExpensesInner() {
           </table>
         </div>
       )}
+      <PageTour tourId="org-expenses" steps={orgExpensesTourSteps} />
     </div>
   );
 }

@@ -12,6 +12,7 @@ export interface DashboardNavItem {
   label: string;
   icon: LucideIcon;
   exact?: boolean;
+  tourId?: string;
 }
 
 export function DashboardShell({
@@ -48,6 +49,7 @@ export function DashboardShell({
                 <Link
                   key={item.href}
                   href={item.href}
+                  data-tour={item.tourId}
                   className={cn(
                     "flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
                     active ? "bg-primary text-primary-foreground" : "text-foreground/75 hover:bg-accent"
@@ -68,6 +70,7 @@ export function DashboardShell({
               <Link
                 key={item.href}
                 href={item.href}
+                data-tour={item.tourId}
                 className={cn("flex flex-col items-center gap-0.5 px-2 text-[10px]", active ? "text-primary" : "text-muted-foreground")}
               >
                 <item.icon className="size-4.5" />

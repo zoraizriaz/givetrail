@@ -8,6 +8,8 @@ import { StatCard } from "@/components/shared/stat-card";
 import { Money } from "@/components/shared/money";
 import { Progress } from "@/components/ui/progress";
 import { EmptyState } from "@/components/shared/empty-state";
+import { PageTour } from "@/components/tour/page-tour";
+import { corporateDashboardTourSteps } from "@/components/tour/steps";
 
 export default function CorporateDashboardPage() {
   const { companyId } = useCurrentUser();
@@ -24,7 +26,7 @@ export default function CorporateDashboardPage() {
       <h1 className="font-heading text-2xl font-semibold text-foreground">{dash.company.name}</h1>
       <p className="text-sm text-muted-foreground">Corporate philanthropy overview.</p>
 
-      <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4" data-tour="corporate-stats">
         <StatCard label="Total giving" value={fmt(dash.totalGiving, dash.currency)} icon={HandCoins} />
         <StatCard label="Organizations funded" value={String(dash.organizationsFundedCount)} icon={Landmark} />
         <StatCard label="Active grants" value={String(dash.activeGrants.length)} icon={Building2} />
@@ -38,7 +40,7 @@ export default function CorporateDashboardPage() {
             View all
           </Link>
         </div>
-        <div className="mt-4 space-y-3">
+        <div className="mt-4 space-y-3" data-tour="corporate-grants-list">
           {dash.activeGrants.map((grant) => {
             const org = getOrganizationById(grant.organizationId);
             const utilizedPct = grant.amountTransferred > 0 ? Math.min(100, (grant.amountUtilized / grant.amountTransferred) * 100) : 0;
@@ -65,6 +67,7 @@ export default function CorporateDashboardPage() {
           })}
         </div>
       </div>
+      <PageTour tourId="corporate-dashboard" steps={corporateDashboardTourSteps} />
     </div>
   );
 }

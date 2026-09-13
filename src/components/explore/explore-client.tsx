@@ -12,6 +12,8 @@ import { CampaignCard } from "@/components/shared/campaign-card";
 import { EmptyState } from "@/components/shared/empty-state";
 import { exploreOrganizations, exploreCampaigns } from "@/lib/data";
 import { applyRuntimeOverrides } from "@/lib/runtime-overrides";
+import { PageTour } from "@/components/tour/page-tour";
+import { exploreTourSteps } from "@/components/tour/steps";
 import type { Campaign, Organization, OrgCategory } from "@/lib/types";
 
 export function ExploreClient({
@@ -50,7 +52,7 @@ export function ExploreClient({
 
   return (
     <div>
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center" data-tour="explore-search">
         <div className="relative flex-1">
           <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
@@ -62,7 +64,7 @@ export function ExploreClient({
         </div>
       </div>
 
-      <div className="mt-4 flex flex-wrap gap-2">
+      <div className="mt-4 flex flex-wrap gap-2" data-tour="explore-categories">
         <Button
           size="sm"
           variant={category === null ? "default" : "outline"}
@@ -89,7 +91,7 @@ export function ExploreClient({
       </div>
 
       <Tabs defaultValue="organizations" className="mt-8">
-        <TabsList>
+        <TabsList data-tour="explore-tabs">
           <TabsTrigger value="organizations">Organizations ({filteredOrgs.length})</TabsTrigger>
           <TabsTrigger value="campaigns">Campaigns ({filteredCampaigns.length})</TabsTrigger>
         </TabsList>
@@ -116,6 +118,7 @@ export function ExploreClient({
           )}
         </TabsContent>
       </Tabs>
+      <PageTour tourId="explore" steps={exploreTourSteps} />
     </div>
   );
 }

@@ -8,6 +8,8 @@ import { PAYMENT_STATUS_META } from "@/lib/payment-status-meta";
 import { formatDate, formatDateShort } from "@/lib/utils/format";
 import { formatPercent } from "@/lib/utils/currency";
 import { initials } from "@/lib/utils/format";
+import { PageTour } from "@/components/tour/page-tour";
+import { givingTrailTourSteps } from "@/components/tour/steps";
 
 export function TrailDetail({ trail }: { trail: DonationTrail }) {
   const { donation, organization, campaign } = trail;
@@ -60,7 +62,7 @@ export function TrailDetail({ trail }: { trail: DonationTrail }) {
       )}
 
       <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_1.3fr]">
-        <div>
+        <div data-tour="trail-flow">
           <h2 className="font-heading text-lg font-semibold text-foreground">How your donation moved</h2>
           <div className="mt-4 space-y-0">
             {flowSteps.map((step, i) => (
@@ -95,7 +97,7 @@ export function TrailDetail({ trail }: { trail: DonationTrail }) {
           </div>
         </div>
 
-        <div>
+        <div data-tour="trail-expenditures">
           <h2 className="font-heading text-lg font-semibold text-foreground">Expenditures</h2>
           {trail.expenditures.length === 0 ? (
             <EmptyState
@@ -143,6 +145,7 @@ export function TrailDetail({ trail }: { trail: DonationTrail }) {
           )}
         </div>
       </div>
+      <PageTour tourId="giving-trail" steps={givingTrailTourSteps} />
     </div>
   );
 }

@@ -5,6 +5,8 @@ import { useCurrentUser } from "@/context/current-user-context";
 import { getOrganizationById, getVerificationForOrg } from "@/lib/data";
 import { OrgVerificationBadge } from "@/components/shared/verification-badge";
 import { formatDate } from "@/lib/utils/format";
+import { PageTour } from "@/components/tour/page-tour";
+import { orgVerificationTourSteps } from "@/components/tour/steps";
 
 const DOC_STATUS_ICON = { accepted: FileCheck, pending: FileClock, rejected: FileX } as const;
 
@@ -16,7 +18,7 @@ export default function OrgVerificationPage() {
 
   return (
     <div className="max-w-2xl">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between" data-tour="org-verification-status">
         <h1 className="font-heading text-2xl font-semibold text-foreground">Verification</h1>
         <OrgVerificationBadge status={org.verificationStatus} />
       </div>
@@ -38,7 +40,7 @@ export default function OrgVerificationPage() {
         </div>
       )}
 
-      <div className="mt-8 rounded-2xl border border-border bg-card p-6 trail-card-shadow">
+      <div className="mt-8 rounded-2xl border border-border bg-card p-6 trail-card-shadow" data-tour="org-verification-docs">
         <h2 className="font-heading text-base font-semibold text-foreground">Submitted documents</h2>
         <div className="mt-4 space-y-3">
           {verification?.documents.length ? (
@@ -67,6 +69,7 @@ export default function OrgVerificationPage() {
         GiveTrail verification confirms registration documentation and financial reconciliation practices. It is not a
         government endorsement.
       </p>
+      <PageTour tourId="org-verification" steps={orgVerificationTourSteps} />
     </div>
   );
 }

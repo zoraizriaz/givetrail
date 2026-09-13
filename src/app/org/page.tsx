@@ -10,6 +10,8 @@ import { MiniBarChart } from "@/components/shared/mini-bar-chart";
 import { Money } from "@/components/shared/money";
 import { EXPENSE_CATEGORY_LABELS, VERIFICATION_LEVEL_LABELS } from "@/lib/expense-category-meta";
 import { formatMoney } from "@/lib/utils/currency";
+import { PageTour } from "@/components/tour/page-tour";
+import { orgDashboardTourSteps } from "@/components/tour/steps";
 
 export default function OrgDashboardPage() {
   const { organizationId } = useCurrentUser();
@@ -30,7 +32,7 @@ export default function OrgDashboardPage() {
         </div>
       </div>
 
-      <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4" data-tour="org-stats">
         <StatCard label="Total funds received" value={formatMoney(dash.totalFundsReceived, currency)} icon={Banknote} />
         <StatCard label="Active donors" value={String(dash.activeDonorCount)} icon={Users} />
         <StatCard label="Available balance" value={formatMoney(dash.availableBalance, currency)} icon={Wallet} />
@@ -130,6 +132,7 @@ export default function OrgDashboardPage() {
           )}
         </OperationalWidget>
       </div>
+      <PageTour tourId="org-dashboard" steps={orgDashboardTourSteps} />
     </div>
   );
 }

@@ -5,11 +5,11 @@ import { LayoutDashboard, Megaphone, Receipt, GitBranch, ShieldCheck, FileBarCha
 
 const NAV: DashboardNavItem[] = [
   { href: "/org", label: "Dashboard", icon: LayoutDashboard, exact: true },
-  { href: "/org/campaigns", label: "Campaigns", icon: Megaphone },
-  { href: "/org/expenses", label: "Expenses", icon: Receipt },
-  { href: "/org/allocations", label: "Allocations", icon: GitBranch },
-  { href: "/org/verification", label: "Verification", icon: ShieldCheck },
-  { href: "/org/reports", label: "Reports", icon: FileBarChart },
+  { href: "/org/campaigns", label: "Campaigns", icon: Megaphone, tourId: "nav-campaigns" },
+  { href: "/org/expenses", label: "Expenses", icon: Receipt, tourId: "nav-expenses" },
+  { href: "/org/allocations", label: "Allocations", icon: GitBranch, tourId: "nav-allocations" },
+  { href: "/org/verification", label: "Verification", icon: ShieldCheck, tourId: "nav-verification" },
+  { href: "/org/reports", label: "Reports", icon: FileBarChart, tourId: "nav-reports" },
   { href: "/org/settings", label: "Settings", icon: Settings },
 ];
 
