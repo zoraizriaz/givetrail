@@ -19,14 +19,14 @@ export async function TransparencyExample() {
   ];
 
   return (
-    <section className="relative overflow-hidden bg-[#111111] py-24 text-white">
+    <section className="relative overflow-hidden bg-[#111111] py-16 text-white">
       <div
-        className="pointer-events-none absolute -left-32 top-0 size-[36rem] rounded-full opacity-25 blur-[100px]"
+        className="pointer-events-none absolute -left-32 top-0 size-[36rem] rounded-full opacity-30 blur-[100px]"
         style={{ background: "radial-gradient(circle, var(--accent-ice), transparent 70%)" }}
         aria-hidden="true"
       />
       <div
-        className="pointer-events-none absolute -right-24 bottom-0 size-[32rem] rounded-full opacity-20 blur-[100px]"
+        className="pointer-events-none absolute -right-24 bottom-0 size-[32rem] rounded-full opacity-25 blur-[100px]"
         style={{ background: "radial-gradient(circle, var(--accent-rose), transparent 70%)" }}
         aria-hidden="true"
       />

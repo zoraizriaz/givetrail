@@ -24,7 +24,7 @@ const PILLARS = [
 export function GlobalVision() {
   return (
     <section className="border-y border-border bg-card/60">
-      <div className="mx-auto max-w-7xl px-4 py-24 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <Reveal>
           <div className="mx-auto max-w-2xl text-center">
             <SectionEyebrow className="justify-center flex">Global by design</SectionEyebrow>
@@ -34,7 +34,7 @@ export function GlobalVision() {
           </div>
         </Reveal>
 
-        <RevealGroup className="mt-14 grid gap-6 md:grid-cols-3">
+        <RevealGroup className="mt-10 grid gap-6 md:grid-cols-3">
           {PILLARS.map((p) => (
             <RevealItem key={p.title} className="rounded-2xl border border-border bg-background p-7">
               <div className="flex size-11 items-center justify-center rounded-xl border border-border text-foreground">
@@ -46,7 +46,7 @@ export function GlobalVision() {
           ))}
         </RevealGroup>
 
-        <div className="mt-12 rounded-2xl border border-dashed border-border bg-background p-6">
+        <div className="mt-8 rounded-2xl border border-dashed border-border bg-background p-6">
           <p className="text-center text-xs font-semibold uppercase tracking-wide text-muted-foreground">Supported currencies</p>
           <div className="mt-4 flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
             {ALL_CURRENCIES.map((c) => (

@@ -1,12 +1,17 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, Check } from "lucide-react";
+import { ArrowRight, Check, HeartHandshake } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { SectionEyebrow, Money } from "@/components/shared/money";
 import { Reveal } from "@/components/shared/reveal";
+import { StatCard } from "@/components/shared/stat-card";
+import { LogoMark } from "@/components/shared/logo";
+import { VerificationLevelBadge, OrgVerificationBadge } from "@/components/shared/verification-badge";
+import { AllocationPolicyBar } from "@/components/org/allocation-policy-bar";
+import { formatMoney } from "@/lib/utils/currency";
 
 const AUDIENCES = [
   {
@@ -44,34 +49,35 @@ const AUDIENCES = [
   },
 ] as const;
 
-function PreviewShell({ children }: { children: React.ReactNode }) {
+/** A small window-chrome header so each preview reads as a real product surface, not a generic mockup. */
+function PreviewChrome({ title }: { title: string }) {
   return (
-    <div className="flex h-full min-h-52 flex-col justify-center rounded-2xl border border-border bg-background p-5">
-      <p className="mb-4 text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground/70">Illustrative preview</p>
+    <div className="mb-4 flex items-center gap-2 border-b border-border/70 pb-3">
+      <LogoMark size={16} />
+      <span className="text-xs font-medium text-muted-foreground">{title}</span>
+    </div>
+  );
+}
+
+function PreviewShell({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div className="flex h-full min-h-56 flex-col justify-center rounded-2xl border border-border bg-background p-5 trail-card-shadow">
+      <PreviewChrome title={title} />
       {children}
     </div>
   );
 }
 
 function DonorPreview() {
-  const rows = [
-    { label: "Donated", amount: 25000 },
-    { label: "Reached organization", amount: 24100 },
-    { label: "Verified expenditure", amount: 21800 },
-  ];
   return (
-    <PreviewShell>
-      <div className="space-y-3">
-        {rows.map((row, i) => (
-          <div key={row.label} className="flex items-center justify-between border-b border-border/70 pb-3 last:border-0 last:pb-0">
-            <span className="text-xs text-muted-foreground">{row.label}</span>
-            <Money
-              amount={row.amount}
-              currency="USD"
-              className={i === rows.length - 1 ? "trail-gradient-text font-heading text-sm font-semibold" : "font-heading text-sm font-semibold text-foreground"}
-            />
-          </div>
-        ))}
+    <PreviewShell title="Giving Trail">
+      <StatCard label="Total lifetime giving" value={formatMoney(120000, "USD")} icon={HeartHandshake} className="border-0 bg-transparent p-0 shadow-none" />
+      <div className="mt-5 flex items-center justify-between border-t border-border/70 pt-4">
+        <span className="text-xs text-muted-foreground">Verified expenditure</span>
+        <Money amount={21800} currency="USD" className="trail-gradient-text font-heading text-sm font-semibold" />
+      </div>
+      <div className="mt-3">
+        <VerificationLevelBadge level="program_verified" />
       </div>
     </PreviewShell>
   );
@@ -79,8 +85,9 @@ function DonorPreview() {
 
 function NgoPreview() {
   return (
-    <PreviewShell>
-      <div className="flex items-center justify-between text-xs">
+    <PreviewShell title="Organization Dashboard">
+      <OrgVerificationBadge status="verified" />
+      <div className="mt-4 flex items-center justify-between text-xs">
         <span className="text-muted-foreground">Documentation completeness</span>
         <span className="font-medium text-foreground">88%</span>
       </div>
@@ -98,29 +105,14 @@ function NgoPreview() {
 }
 
 function CorporatePreview() {
-  const segments = [
-    { label: "Utilized", pct: 64, tint: "var(--accent-peach)" },
-    { label: "Committed", pct: 22, tint: "var(--accent-lavender)" },
-    { label: "Available", pct: 14, tint: "var(--accent-ice)" },
-  ];
   return (
-    <PreviewShell>
+    <PreviewShell title="Grant Utilization">
       <div className="flex items-center justify-between">
-        <span className="text-xs text-muted-foreground">Grant utilization</span>
-        <Money amount={500000} currency="USD" className="font-heading text-sm font-semibold text-foreground" />
+        <span className="text-xs text-muted-foreground">Total committed</span>
+        <Money amount={50000000} currency="USD" className="font-heading text-sm font-semibold text-foreground" />
       </div>
-      <div className="mt-3 flex h-2.5 w-full overflow-hidden rounded-full bg-muted">
-        {segments.map((seg) => (
-          <div key={seg.label} style={{ width: `${seg.pct}%`, background: seg.tint }} />
-        ))}
-      </div>
-      <div className="mt-4 flex flex-wrap gap-x-5 gap-y-1.5">
-        {segments.map((seg) => (
-          <div key={seg.label} className="flex items-center gap-1.5 text-xs text-muted-foreground">
-            <span className="size-2 rounded-full" style={{ background: seg.tint }} />
-            {seg.label} · {seg.pct}%
-          </div>
-        ))}
+      <div className="mt-4">
+        <AllocationPolicyBar policy={{ programPct: 0.64, operationsPct: 0.14, fundraisingPct: 0.08, paymentProcessingPct: 0.14 }} />
       </div>
     </PreviewShell>
   );
@@ -135,7 +127,7 @@ const PREVIEWS: Record<(typeof AUDIENCES)[number]["value"], React.ComponentType>
 export function AudienceSections() {
   return (
     <section className="border-y border-border bg-muted/40">
-      <div className="mx-auto max-w-7xl px-4 py-24 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <Reveal>
           <div className="mx-auto max-w-2xl text-center">
             <SectionEyebrow className="justify-center flex">Built for every kind of giver</SectionEyebrow>
@@ -144,7 +136,7 @@ export function AudienceSections() {
         </Reveal>
 
         <Reveal delay={0.1}>
-          <Tabs defaultValue="donors" className="mt-12">
+          <Tabs defaultValue="donors" className="mt-8">
             <TabsList className="mx-auto grid w-full max-w-md grid-cols-3 rounded-full">
               {AUDIENCES.map((a) => (
                 <TabsTrigger key={a.value} value={a.value} className="rounded-full">
@@ -155,7 +147,7 @@ export function AudienceSections() {
             {AUDIENCES.map((a) => {
               const Preview = PREVIEWS[a.value];
               return (
-                <TabsContent key={a.value} value={a.value} className="mt-10">
+                <TabsContent key={a.value} value={a.value} className="mt-8">
                   <div className="mx-auto grid max-w-3xl gap-6 rounded-3xl border border-border bg-card p-8 sm:p-10 trail-card-shadow md:grid-cols-[1.2fr_1fr] md:items-center">
                     <div>
                       <h3 className="font-heading text-2xl font-semibold text-foreground">{a.title}</h3>

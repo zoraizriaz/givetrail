@@ -31,7 +31,7 @@ export async function Stats() {
   ];
 
   return (
-    <section className="mx-auto max-w-6xl px-4 py-24 sm:px-6 lg:px-8">
+    <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8">
       <Reveal>
         <SectionEyebrow>Live on the platform</SectionEyebrow>
         <h2 className="mt-3 max-w-lg font-heading text-3xl font-medium text-foreground sm:text-4xl">
@@ -39,10 +39,10 @@ export async function Stats() {
         </h2>
       </Reveal>
 
-      <RevealGroup className="mt-14 divide-y divide-border border-t border-border">
+      <RevealGroup className="mt-10 divide-y divide-border border-t border-border">
         {rows.map((row, i) => (
           <RevealItem key={row.label}>
-            <div className="grid items-center gap-3 py-7 sm:grid-cols-[1fr_auto] sm:gap-10">
+            <div className="grid items-center gap-3 py-6 sm:grid-cols-[1fr_auto] sm:gap-10">
               <div>
                 <p className="font-heading text-4xl font-semibold tabular-nums text-foreground sm:text-5xl">{row.value}</p>
                 <p className="mt-1 text-sm text-muted-foreground">{row.label}</p>
@@ -56,8 +56,12 @@ export async function Stats() {
                   }}
                 />
                 <span
-                  className="absolute top-1/2 size-3 -translate-y-1/2 rounded-full border-2 border-card shadow-sm"
-                  style={{ left: `calc(${row.fill}% - 6px)`, background: TINTS[i % TINTS.length] }}
+                  className="absolute top-1/2 size-3 -translate-y-1/2 rounded-full border-2 border-card"
+                  style={{
+                    left: `calc(${row.fill}% - 6px)`,
+                    background: TINTS[i % TINTS.length],
+                    boxShadow: `0 0 8px 1px color-mix(in oklab, ${TINTS[i % TINTS.length]} 70%, transparent)`,
+                  }}
                 />
               </div>
             </div>

@@ -12,25 +12,25 @@ export async function Hero() {
   return (
     <section className="relative overflow-hidden">
       <HeroGlow />
-      <div className="relative mx-auto max-w-7xl px-4 pb-20 pt-14 sm:px-6 lg:px-8 lg:pb-28 lg:pt-20">
+      <div className="relative mx-auto max-w-7xl px-4 pb-14 pt-10 sm:px-6 lg:px-8 lg:pb-20 lg:pt-14">
         <div className="mx-auto max-w-3xl text-center">
           <SectionEyebrow className="hero-in justify-center flex">Give. Track. Verify.</SectionEyebrow>
           <h1
-            className="hero-in mt-5 font-heading text-5xl font-medium leading-[1.03] tracking-tight text-balance sm:text-6xl lg:text-7xl"
+            className="hero-in mt-4 font-heading text-5xl font-medium leading-[1.03] tracking-tight text-balance sm:text-6xl lg:text-7xl"
             style={{ ["--hero-in-delay" as string]: "0.08s" }}
           >
             <span className="text-muted-foreground/70">See where</span>{" "}
             <span className="text-foreground">your giving goes.</span>
           </h1>
           <p
-            className="hero-in mx-auto mt-6 max-w-xl text-balance text-lg text-muted-foreground"
+            className="hero-in mx-auto mt-5 max-w-xl text-balance text-lg text-muted-foreground"
             style={{ ["--hero-in-delay" as string]: "0.16s" }}
           >
             Donate to verified organizations and follow your contribution from payment to documented impact.
             Every donation leaves a trail.
           </p>
           <div
-            className="hero-in mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row"
+            className="hero-in mt-7 flex flex-col items-center justify-center gap-3 sm:flex-row"
             style={{ ["--hero-in-delay" as string]: "0.24s" }}
           >
             <Button asChild size="lg" className="gap-2 rounded-full px-6" data-tour="hero-explore-cta">
@@ -45,7 +45,7 @@ export async function Hero() {
         </div>
 
         {trail && (
-          <div className="hero-in mx-auto mt-20 max-w-5xl" style={{ ["--hero-in-delay" as string]: "0.32s" }} data-tour="hero-trail-visual">
+          <div className="hero-in mx-auto mt-14 max-w-5xl" style={{ ["--hero-in-delay" as string]: "0.32s" }} data-tour="hero-trail-visual">
             <HomeTrailVisual
               currency={trail.donation.currency}
               grossAmount={trail.donation.grossAmount}

@@ -1,6 +1,7 @@
 "use client";
 
-import { motion, useReducedMotion } from "motion/react";
+import { useRef } from "react";
+import { motion, useReducedMotion, useInView } from "motion/react";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { Money } from "@/components/shared/money";
@@ -41,6 +42,8 @@ export function HomeTrailVisual({
   additionalExpenseCount?: number;
 }) {
   const reduceMotion = useReducedMotion();
+  const containerRef = useRef<HTMLDivElement>(null);
+  const inView = useInView(containerRef, { once: true, margin: "-40px" });
 
   const verifiedCaption = expenseDescription
     ? additionalExpenseCount > 0
@@ -56,7 +59,7 @@ export function HomeTrailVisual({
   ];
 
   return (
-    <div>
+    <div ref={containerRef}>
       <p className="text-center text-sm text-muted-foreground">
         A real donation to{" "}
         <Link href={`/organizations/${organizationSlug}`} className="font-medium text-foreground hover:underline">
@@ -65,7 +68,7 @@ export function HomeTrailVisual({
         , tracked end to end on GiveTrail
       </p>
 
-      <div className="mt-10 flex flex-col gap-10 sm:flex-row sm:items-start sm:justify-between sm:gap-2">
+      <div className="mt-8 flex flex-col gap-8 sm:flex-row sm:items-start sm:justify-between sm:gap-2">
         {steps.map((step, i) => (
           <div key={step.key} className="flex items-center sm:contents">
             <div className="flex flex-col items-start sm:items-center sm:text-center">
@@ -87,16 +90,33 @@ export function HomeTrailVisual({
                 className="relative mx-4 hidden h-px flex-1 self-center overflow-hidden bg-border sm:block"
                 aria-hidden="true"
               >
+                {/* Initial draw-in as the trail scrolls into view */}
                 <motion.span
-                  className="absolute inset-y-0 left-0 w-10 rounded-full opacity-80"
-                  style={{
-                    background: `linear-gradient(90deg, transparent, ${CONNECTOR_TINTS[i % CONNECTOR_TINTS.length]}, transparent)`,
-                  }}
-                  initial={reduceMotion ? undefined : { left: "-10%" }}
-                  whileInView={reduceMotion ? undefined : { left: "100%" }}
-                  viewport={{ once: true, margin: "-40px" }}
-                  transition={{ duration: 1.1, delay: 0.3 + i * 0.15, ease: [0.16, 1, 0.3, 1] }}
+                  className="absolute inset-y-0 left-0 right-0 origin-left"
+                  style={{ background: "var(--foreground)", opacity: 0.08 }}
+                  initial={reduceMotion ? undefined : { scaleX: 0 }}
+                  animate={inView && !reduceMotion ? { scaleX: 1 } : undefined}
+                  transition={{ duration: 0.7, delay: 0.15 + i * 0.12, ease: [0.16, 1, 0.3, 1] }}
                 />
+                {/* A small light that periodically travels the connector — restrained, not constant */}
+                {inView && !reduceMotion && (
+                  <motion.span
+                    className="absolute inset-y-0 left-0 w-12 rounded-full"
+                    style={{
+                      background: `linear-gradient(90deg, transparent, ${CONNECTOR_TINTS[i % CONNECTOR_TINTS.length]} 65%, #fff)`,
+                      boxShadow: `0 0 10px 1px ${CONNECTOR_TINTS[i % CONNECTOR_TINTS.length]}`,
+                    }}
+                    initial={{ left: "-12%", opacity: 0 }}
+                    animate={{ left: "100%", opacity: [0, 1, 1, 0] }}
+                    transition={{
+                      duration: 1.6,
+                      delay: 0.6 + i * 0.15,
+                      repeat: Infinity,
+                      repeatDelay: 3.4,
+                      ease: [0.4, 0, 0.2, 1],
+                    }}
+                  />
+                )}
               </div>
             )}
             {i < steps.length - 1 && <div className="ml-0 h-8 w-px self-stretch bg-border sm:hidden" aria-hidden="true" />}
@@ -104,8 +124,11 @@ export function HomeTrailVisual({
         ))}
       </div>
 
-      <div className="mt-10 flex flex-col items-center gap-3">
-        <div className="flex items-center gap-2 rounded-full border border-border bg-card px-5 py-2.5 text-center trail-card-shadow">
+      <div className="mt-8 flex flex-col items-center gap-3">
+        <div
+          className="flex items-center gap-2 rounded-full border border-border bg-card px-5 py-2.5 text-center trail-card-shadow"
+          style={{ boxShadow: "0 0 0 1px var(--border), 0 8px 28px -12px color-mix(in oklab, var(--accent-rose) 45%, transparent)" }}
+        >
           <span className="font-heading text-base font-semibold text-foreground">{(pctAccountedFor * 100).toFixed(1)}%</span>
           <span className="text-sm text-muted-foreground">of this contribution&rsquo;s program allocation accounted for</span>
         </div>
