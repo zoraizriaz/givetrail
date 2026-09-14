@@ -6,7 +6,7 @@ import { Logo } from "@/components/shared/logo";
 import { AccountMenu } from "@/components/layout/account-menu";
 import { EmptyState } from "@/components/shared/empty-state";
 import { useCurrentUser } from "@/context/current-user-context";
-import { getDonorNotifications } from "@/lib/data";
+import { useNotifications } from "@/lib/hooks/use-notifications";
 import { formatRelativeTime } from "@/lib/utils/format";
 import { cn } from "@/lib/utils";
 
@@ -38,7 +38,9 @@ export default function NotificationsPage() {
 }
 
 function NotificationsList({ userId }: { userId: string }) {
-  const notifications = getDonorNotifications(userId);
+  const { notifications, isLoading } = useNotifications(userId);
+
+  if (isLoading) return null;
 
   if (notifications.length === 0) {
     return <EmptyState className="mt-8" icon={Bell} title="You're all caught up" description="New updates about your donations will appear here." />;

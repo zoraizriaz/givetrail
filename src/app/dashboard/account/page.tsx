@@ -1,20 +1,35 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useCurrentUser } from "@/context/current-user-context";
 import { ALL_CURRENCIES } from "@/lib/utils/currency";
-import { donorProfiles } from "@/lib/data";
+import { createClient } from "@/lib/supabase/client";
 import { EmptyState } from "@/components/shared/empty-state";
 import { UserCog } from "lucide-react";
+import type { Currency } from "@/lib/types";
 
 export default function DonorAccountPage() {
   const { user } = useCurrentUser();
-  if (!user) return <EmptyState icon={UserCog} title="Log in to manage your account" />;
+  const [preferredCurrency, setPreferredCurrency] = useState<Currency>("USD");
 
-  const profile = donorProfiles.find((p) => p.userId === user.id);
+  useEffect(() => {
+    if (!user) return;
+    const supabase = createClient();
+    supabase
+      .from("donor_profiles")
+      .select("preferred_currency")
+      .eq("user_id", user.id)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (data?.preferred_currency) setPreferredCurrency(data.preferred_currency as Currency);
+      });
+  }, [user]);
+
+  if (!user) return <EmptyState icon={UserCog} title="Log in to manage your account" />;
 
   return (
     <div className="max-w-lg">
@@ -32,7 +47,7 @@ export default function DonorAccountPage() {
         </div>
         <div className="space-y-1.5">
           <Label>Preferred currency</Label>
-          <Select defaultValue={profile?.preferredCurrency ?? "USD"}>
+          <Select value={preferredCurrency} onValueChange={(v) => setPreferredCurrency(v as Currency)}>
             <SelectTrigger className="w-full">
               <SelectValue />
             </SelectTrigger>

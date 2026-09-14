@@ -1,13 +1,11 @@
 import Link from "next/link";
 import { MapPin } from "lucide-react";
-import type { Campaign } from "@/lib/types";
+import type { Campaign, Organization } from "@/lib/types";
 import { Money } from "@/components/shared/money";
 import { Progress } from "@/components/ui/progress";
 import { CATEGORY_META } from "@/lib/category-meta";
-import { getOrganizationById } from "@/lib/data";
 
-export function CampaignCard({ campaign }: { campaign: Campaign }) {
-  const org = getOrganizationById(campaign.organizationId);
+export function CampaignCard({ campaign, organization: org }: { campaign: Campaign; organization?: Organization }) {
   const pct = campaign.fundingGoal > 0 ? Math.min(100, (campaign.amountRaised / campaign.fundingGoal) * 100) : 0;
   const Icon = CATEGORY_META[campaign.category].icon;
 

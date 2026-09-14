@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Bell, ChevronDown, LayoutDashboard, LogOut, UserCircle2 } from "lucide-react";
+import { Bell, ChevronDown, LayoutDashboard, LogOut } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,9 +12,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { DEMO_ACCOUNTS, dashboardHrefForRole, useCurrentUser } from "@/context/current-user-context";
+import { dashboardHrefForRole, useCurrentUser } from "@/context/current-user-context";
 import { initials } from "@/lib/utils/format";
-import { getDonorNotifications } from "@/lib/data";
+import { useUnreadNotificationCount } from "@/lib/hooks/use-notifications";
 
 const ROLE_LABEL: Record<string, string> = {
   donor: "Individual donor",
@@ -24,7 +24,8 @@ const ROLE_LABEL: Record<string, string> = {
 };
 
 export function AccountMenu() {
-  const { user, setCurrentUserId, logOut } = useCurrentUser();
+  const { user, logOut } = useCurrentUser();
+  const unreadCount = useUnreadNotificationCount(user?.id);
 
   if (!user) {
     return (
@@ -38,8 +39,6 @@ export function AccountMenu() {
       </div>
     );
   }
-
-  const unreadCount = getDonorNotifications(user.id).filter((n) => !n.read).length;
 
   return (
     <div className="flex items-center gap-1.5">
@@ -77,17 +76,6 @@ export function AccountMenu() {
               <Bell className="size-4" /> Notifications
             </Link>
           </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuLabel className="text-xs text-muted-foreground">Demo · switch account</DropdownMenuLabel>
-          {DEMO_ACCOUNTS.map((account) => (
-            <DropdownMenuItem key={account.id} onSelect={() => setCurrentUserId(account.id)} disabled={account.id === user.id}>
-              <UserCircle2 className="size-4" />
-              <span className="flex flex-col">
-                <span>{account.label}</span>
-                <span className="text-xs text-muted-foreground">{account.description}</span>
-              </span>
-            </DropdownMenuItem>
-          ))}
           <DropdownMenuSeparator />
           <DropdownMenuItem onSelect={() => logOut()}>
             <LogOut className="size-4" /> Log out

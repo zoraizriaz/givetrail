@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -10,29 +10,22 @@ import { CATEGORY_META, ALL_CATEGORIES } from "@/lib/category-meta";
 import { OrganizationCard } from "@/components/shared/organization-card";
 import { CampaignCard } from "@/components/shared/campaign-card";
 import { EmptyState } from "@/components/shared/empty-state";
-import { exploreOrganizations, exploreCampaigns } from "@/lib/data";
-import { applyRuntimeOverrides } from "@/lib/runtime-overrides";
 import { PageTour } from "@/components/tour/page-tour";
 import { exploreTourSteps } from "@/components/tour/steps";
 import type { Campaign, Organization, OrgCategory } from "@/lib/types";
 
 export function ExploreClient({
-  organizations: initialOrganizations,
-  campaigns: initialCampaigns,
+  organizations,
+  campaigns,
+  fundsReceivedByOrgId,
 }: {
   organizations: Organization[];
   campaigns: Campaign[];
+  fundsReceivedByOrgId: Record<string, number>;
 }) {
-  const [organizations, setOrganizations] = useState(initialOrganizations);
-  const [campaigns, setCampaigns] = useState(initialCampaigns);
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<OrgCategory | null>(null);
-
-  useEffect(() => {
-    applyRuntimeOverrides();
-    setOrganizations(exploreOrganizations());
-    setCampaigns(exploreCampaigns());
-  }, []);
+  const orgById = useMemo(() => Object.fromEntries(organizations.map((o) => [o.id, o])), [organizations]);
 
   const filteredOrgs = useMemo(() => {
     return organizations.filter((o) => {
@@ -101,7 +94,7 @@ export function ExploreClient({
           ) : (
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {filteredOrgs.map((o) => (
-                <OrganizationCard key={o.id} organization={o} />
+                <OrganizationCard key={o.id} organization={o} fundsReceived={fundsReceivedByOrgId[o.id]} />
               ))}
             </div>
           )}
@@ -112,7 +105,7 @@ export function ExploreClient({
           ) : (
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {filteredCampaigns.map((c) => (
-                <CampaignCard key={c.id} campaign={c} />
+                <CampaignCard key={c.id} campaign={c} organization={orgById[c.organizationId]} />
               ))}
             </div>
           )}

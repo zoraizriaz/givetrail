@@ -1,35 +1,32 @@
-"use client";
-
-import { use } from "react";
 import Link from "next/link";
 import { Logo } from "@/components/shared/logo";
 import { CheckoutForm } from "@/components/checkout/checkout-form";
 import { EmptyState } from "@/components/shared/empty-state";
-import { getOrganizationBySlug, getCampaignsByOrg } from "@/lib/data";
-import { applyRuntimeOverrides } from "@/lib/runtime-overrides";
-import { useMounted } from "@/lib/use-mounted";
+import { getVerifiedOrganizationBySlug, getCampaignsForOrg } from "@/lib/supabase-data";
+import { createClient } from "@/lib/supabase/server";
 import { Landmark } from "lucide-react";
 
-export default function CheckoutPage({
+export default async function CheckoutPage({
   params,
   searchParams,
 }: {
   params: Promise<{ orgSlug: string }>;
   searchParams: Promise<{ campaign?: string }>;
 }) {
-  const { orgSlug } = use(params);
-  const { campaign } = use(searchParams);
-  const mounted = useMounted();
-  if (!mounted) return null;
+  const { orgSlug } = await params;
+  const { campaign } = await searchParams;
+  const organization = await getVerifiedOrganizationBySlug(orgSlug);
 
-  applyRuntimeOverrides();
-  const organization = getOrganizationBySlug(orgSlug);
-
-  if (!organization || organization.verificationStatus !== "verified") {
+  if (!organization) {
     return <EmptyState icon={Landmark} title="This organization can't accept donations yet" className="mx-auto mt-20 max-w-lg" />;
   }
 
-  const campaigns = getCampaignsByOrg(organization.id).filter((c) => c.status === "active");
+  const supabase = await createClient();
+  const [campaigns, { data: settings }] = await Promise.all([
+    getCampaignsForOrg(organization.id).then((all) => all.filter((c) => c.status === "active")),
+    supabase.from("platform_settings").select("platform_fee_pct").eq("id", true).maybeSingle(),
+  ]);
+  const platformFeePct = Number(settings?.platform_fee_pct ?? 0.01);
 
   return (
     <div className="min-h-screen bg-background">
@@ -49,7 +46,7 @@ export default function CheckoutPage({
         <h1 className="mt-1 font-heading text-3xl font-semibold text-foreground">{organization.name}</h1>
 
         <div className="mt-10">
-          <CheckoutForm organization={organization} campaigns={campaigns} preselectedCampaignId={campaign} />
+          <CheckoutForm organization={organization} campaigns={campaigns} preselectedCampaignId={campaign} platformFeePct={platformFeePct} />
         </div>
       </div>
     </div>

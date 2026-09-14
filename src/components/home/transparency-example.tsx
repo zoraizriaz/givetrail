@@ -4,11 +4,12 @@ import { SectionEyebrow } from "@/components/shared/money";
 import { Money } from "@/components/shared/money";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { getOrgTransparency, getOrganizationById } from "@/lib/data";
+import { getOrgPublicProfile } from "@/lib/supabase-data";
 
-export function TransparencyExample() {
-  const org = getOrganizationById("org-brightpath")!;
-  const t = getOrgTransparency(org.id);
+export async function TransparencyExample() {
+  const profile = await getOrgPublicProfile("bright-path-education-trust");
+  if (!profile) return null;
+  const { organization: org, transparency: t } = profile;
   const documentedPct = t.allocatedToPrograms > 0 ? t.documentedExpenditure / t.allocatedToPrograms : 0;
 
   const rows = [

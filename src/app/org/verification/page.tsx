@@ -1,8 +1,5 @@
-"use client";
-
 import { AlertTriangle, FileCheck, FileClock, FileX } from "lucide-react";
-import { useCurrentUser } from "@/context/current-user-context";
-import { getOrganizationById, getVerificationForOrg } from "@/lib/data";
+import { getCurrentMemberships, getOrganizationById, getVerificationForOrg } from "@/lib/ngo-data";
 import { OrgVerificationBadge } from "@/components/shared/verification-badge";
 import { formatDate } from "@/lib/utils/format";
 import { PageTour } from "@/components/tour/page-tour";
@@ -10,11 +7,11 @@ import { orgVerificationTourSteps } from "@/components/tour/steps";
 
 const DOC_STATUS_ICON = { accepted: FileCheck, pending: FileClock, rejected: FileX } as const;
 
-export default function OrgVerificationPage() {
-  const { organizationId } = useCurrentUser();
+export default async function OrgVerificationPage() {
+  const { organizationId } = await getCurrentMemberships();
   if (!organizationId) return null;
-  const org = getOrganizationById(organizationId)!;
-  const verification = getVerificationForOrg(organizationId);
+  const [org, verification] = await Promise.all([getOrganizationById(organizationId), getVerificationForOrg(organizationId)]);
+  if (!org) return null;
 
   return (
     <div className="max-w-2xl">

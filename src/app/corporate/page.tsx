@@ -1,9 +1,6 @@
-"use client";
-
 import Link from "next/link";
 import { Building2, HandCoins, Landmark, ShieldCheck } from "lucide-react";
-import { useCurrentUser } from "@/context/current-user-context";
-import { getCorporateDashboard, getOrganizationById } from "@/lib/data";
+import { getCurrentMemberships, getCorporateDashboard, getOrganizationById } from "@/lib/ngo-data";
 import { StatCard } from "@/components/shared/stat-card";
 import { Money } from "@/components/shared/money";
 import { Progress } from "@/components/ui/progress";
@@ -11,15 +8,21 @@ import { EmptyState } from "@/components/shared/empty-state";
 import { PageTour } from "@/components/tour/page-tour";
 import { corporateDashboardTourSteps } from "@/components/tour/steps";
 
-export default function CorporateDashboardPage() {
-  const { companyId } = useCurrentUser();
+export default async function CorporateDashboardPage() {
+  const { companyId } = await getCurrentMemberships();
 
   if (!companyId) {
     return <EmptyState icon={Building2} title="No company linked" description="Log in as a corporate donor to see this dashboard." />;
   }
 
-  const dash = getCorporateDashboard(companyId);
+  const dash = await getCorporateDashboard(companyId);
   if (!dash.company) return null;
+
+  const orgsById = new Map(
+    await Promise.all(
+      Array.from(new Set(dash.activeGrants.map((g) => g.organizationId))).map(async (id) => [id, await getOrganizationById(id)] as const)
+    )
+  );
 
   return (
     <div>
@@ -42,7 +45,7 @@ export default function CorporateDashboardPage() {
         </div>
         <div className="mt-4 space-y-3" data-tour="corporate-grants-list">
           {dash.activeGrants.map((grant) => {
-            const org = getOrganizationById(grant.organizationId);
+            const org = orgsById.get(grant.organizationId);
             const utilizedPct = grant.amountTransferred > 0 ? Math.min(100, (grant.amountUtilized / grant.amountTransferred) * 100) : 0;
             return (
               <Link

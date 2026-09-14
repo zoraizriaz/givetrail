@@ -1,34 +1,23 @@
-"use client";
-
-import { use, useState } from "react";
 import Link from "next/link";
-import { ChevronLeft, FileCheck, FileClock, FileX } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { getOrganizationById, getVerificationForOrg, setOrgVerificationStatus, getOrgTransparency } from "@/lib/data";
-import { persistOrgStatusOverride } from "@/lib/runtime-overrides";
+import { ChevronLeft, FileCheck, FileClock, FileX, Landmark } from "lucide-react";
+import { getOrganizationById, getVerificationForOrg } from "@/lib/ngo-data";
+import { getOrgTransparency } from "@/lib/supabase-data";
 import { OrgVerificationBadge } from "@/components/shared/verification-badge";
 import { Money } from "@/components/shared/money";
 import { EmptyState } from "@/components/shared/empty-state";
-import { Landmark } from "lucide-react";
-import type { OrgVerificationStatus } from "@/lib/types";
+import { VerificationActions } from "@/components/admin/verification-actions";
 
 const DOC_STATUS_ICON = { accepted: FileCheck, pending: FileClock, rejected: FileX } as const;
 
-export default function AdminNgoDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = use(params);
-  const [, forceRender] = useState(0);
-  const org = getOrganizationById(id);
-  const verification = getVerificationForOrg(id);
-
+export default async function AdminNgoDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const org = await getOrganizationById(id);
   if (!org) return <EmptyState icon={Landmark} title="Organization not found" />;
 
-  const transparency = getOrgTransparency(org.id);
-
-  function updateStatus(status: OrgVerificationStatus) {
-    setOrgVerificationStatus(org!.id, status);
-    persistOrgStatusOverride(org!.id, status);
-    forceRender((n) => n + 1);
-  }
+  const [verification, transparency] = await Promise.all([
+    getVerificationForOrg(id),
+    getOrgTransparency(id, org.baseCurrency, org.allocationPolicy.programPct),
+  ]);
 
   return (
     <div className="max-w-3xl">
@@ -84,20 +73,7 @@ export default function AdminNgoDetailPage({ params }: { params: Promise<{ id: s
 
       <div className="mt-8 rounded-2xl border border-border bg-card p-6 trail-card-shadow">
         <h2 className="font-heading text-base font-semibold text-foreground">Review actions</h2>
-        <div className="mt-4 flex flex-wrap gap-2">
-          <Button size="sm" onClick={() => updateStatus("verified")} disabled={org.verificationStatus === "verified"}>
-            Approve
-          </Button>
-          <Button size="sm" variant="outline" onClick={() => updateStatus("additional_info_required")}>
-            Request more info
-          </Button>
-          <Button size="sm" variant="outline" onClick={() => updateStatus("rejected")}>
-            Reject
-          </Button>
-          <Button size="sm" variant="outline" onClick={() => updateStatus("suspended")} disabled={org.verificationStatus !== "verified"}>
-            Suspend
-          </Button>
-        </div>
+        <VerificationActions organizationId={org.id} currentStatus={org.verificationStatus} />
       </div>
     </div>
   );

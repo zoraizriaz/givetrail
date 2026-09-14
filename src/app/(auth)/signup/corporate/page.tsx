@@ -5,11 +5,12 @@ import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { useCurrentUser } from "@/context/current-user-context";
+import { DEMO_PASSWORD } from "@/context/current-user-context";
+import { createClient } from "@/lib/supabase/client";
 
 export default function CorporateSignupPage() {
   const router = useRouter();
-  const { setCurrentUserId } = useCurrentUser();
+  const supabase = createClient();
   const [submitted, setSubmitted] = useState(false);
   const [company, setCompany] = useState("");
   const [name, setName] = useState("");
@@ -30,9 +31,10 @@ export default function CorporateSignupPage() {
         </p>
         <Button
           className="mt-6 w-full"
-          onClick={() => {
-            setCurrentUserId("u-corp-james");
+          onClick={async () => {
+            await supabase.auth.signInWithPassword({ email: "james.okafor@brightfuture-corp.com", password: DEMO_PASSWORD });
             router.push("/corporate");
+            router.refresh();
           }}
         >
           Preview corporate dashboard

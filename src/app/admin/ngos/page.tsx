@@ -1,12 +1,16 @@
-"use client";
-
 import Link from "next/link";
-import { listAllOrganizationsForAdmin, getOrgTransparency } from "@/lib/data";
+import { listAllOrganizationsForAdmin } from "@/lib/ngo-data";
+import { getOrgTransparency } from "@/lib/supabase-data";
 import { OrgVerificationBadge } from "@/components/shared/verification-badge";
 import { Money } from "@/components/shared/money";
 
-export default function AdminNgosPage() {
-  const organizations = listAllOrganizationsForAdmin();
+export default async function AdminNgosPage() {
+  const organizations = await listAllOrganizationsForAdmin();
+  const transparencyByOrgId = new Map(
+    await Promise.all(
+      organizations.map(async (org) => [org.id, await getOrgTransparency(org.id, org.baseCurrency, org.allocationPolicy.programPct)] as const)
+    )
+  );
 
   return (
     <div>
@@ -25,7 +29,7 @@ export default function AdminNgosPage() {
           </thead>
           <tbody>
             {organizations.map((org) => {
-              const transparency = getOrgTransparency(org.id);
+              const transparency = transparencyByOrgId.get(org.id)!;
               return (
                 <tr key={org.id} className="border-b border-border/70 last:border-0 hover:bg-accent/30">
                   <td className="px-4 py-3">

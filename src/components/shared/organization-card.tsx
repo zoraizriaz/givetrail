@@ -4,11 +4,15 @@ import type { Organization } from "@/lib/types";
 import { OrgVerificationBadge } from "@/components/shared/verification-badge";
 import { CATEGORY_META } from "@/lib/category-meta";
 import { initials } from "@/lib/utils/format";
-import { getOrgTransparency } from "@/lib/data";
 import { Money } from "@/components/shared/money";
 
-export function OrganizationCard({ organization }: { organization: Organization }) {
-  const transparency = getOrgTransparency(organization.id);
+export function OrganizationCard({
+  organization,
+  fundsReceived = 0,
+}: {
+  organization: Organization;
+  fundsReceived?: number;
+}) {
   return (
     <Link
       href={`/organizations/${organization.slug}`}
@@ -37,7 +41,7 @@ export function OrganizationCard({ organization }: { organization: Organization 
         <div className="mt-5 flex items-center justify-between border-t border-border pt-4">
           <div>
             <p className="text-xs text-muted-foreground">Raised on GiveTrail</p>
-            <Money amount={transparency.fundsReceived} currency={transparency.currency} className="font-heading text-sm font-semibold" />
+            <Money amount={fundsReceived} currency={organization.baseCurrency} className="font-heading text-sm font-semibold" />
           </div>
           <OrgVerificationBadge status={organization.verificationStatus} className="px-2 py-0.5 text-[10px]" />
         </div>

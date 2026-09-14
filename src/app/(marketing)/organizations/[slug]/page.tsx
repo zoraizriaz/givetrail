@@ -1,8 +1,5 @@
-"use client";
-
-import { use } from "react";
 import Link from "next/link";
-import { AlertTriangle, ArrowRight, Globe, MapPin, Users } from "lucide-react";
+import { AlertTriangle, ArrowRight, Globe, MapPin, Users, Landmark } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Money } from "@/components/shared/money";
@@ -13,20 +10,13 @@ import { EmptyState } from "@/components/shared/empty-state";
 import { AllocationPolicyBar } from "@/components/org/allocation-policy-bar";
 import { CATEGORY_META } from "@/lib/category-meta";
 import { initials } from "@/lib/utils/format";
-import { getOrgPublicProfile } from "@/lib/data";
-import { applyRuntimeOverrides } from "@/lib/runtime-overrides";
-import { useMounted } from "@/lib/use-mounted";
+import { getOrgPublicProfile } from "@/lib/supabase-data";
 import { PageTour } from "@/components/tour/page-tour";
 import { orgProfileTourSteps } from "@/components/tour/steps";
-import { Landmark } from "lucide-react";
 
-export default function OrganizationProfilePage({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = use(params);
-  const mounted = useMounted();
-  if (!mounted) return null;
-
-  applyRuntimeOverrides();
-  const profile = getOrgPublicProfile(slug);
+export default async function OrganizationProfilePage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const profile = await getOrgPublicProfile(slug);
   if (!profile) {
     return <EmptyState icon={Landmark} title="Organization not found" className="mx-auto mt-20 max-w-lg" />;
   }
@@ -115,7 +105,7 @@ export default function OrganizationProfilePage({ params }: { params: Promise<{ 
               ) : (
                 <div className="mt-5 grid gap-6 sm:grid-cols-2">
                   {campaigns.map((c) => (
-                    <CampaignCard key={c.id} campaign={c} />
+                    <CampaignCard key={c.id} campaign={c} organization={organization} />
                   ))}
                 </div>
               )}

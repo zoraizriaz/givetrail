@@ -1,8 +1,6 @@
-"use client";
-
 import Link from "next/link";
 import { Banknote, Globe2, Landmark, ShieldCheck, TrendingUp, Users } from "lucide-react";
-import { getAdminAnalytics, getPendingVerificationOrgs } from "@/lib/data";
+import { getAdminAnalytics, getPendingVerificationOrgs } from "@/lib/ngo-data";
 import { StatCard } from "@/components/shared/stat-card";
 import { MiniBarChart } from "@/components/shared/mini-bar-chart";
 import { OrgVerificationBadge } from "@/components/shared/verification-badge";
@@ -10,9 +8,8 @@ import { formatMoney } from "@/lib/utils/currency";
 import { PageTour } from "@/components/tour/page-tour";
 import { adminDashboardTourSteps } from "@/components/tour/steps";
 
-export default function AdminDashboardPage() {
-  const analytics = getAdminAnalytics();
-  const pending = getPendingVerificationOrgs();
+export default async function AdminDashboardPage() {
+  const [analytics, pending] = await Promise.all([getAdminAnalytics(), getPendingVerificationOrgs()]);
 
   return (
     <div>

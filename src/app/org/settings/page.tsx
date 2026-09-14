@@ -1,17 +1,20 @@
-"use client";
-
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { useCurrentUser } from "@/context/current-user-context";
-import { getOrganizationById, platformSettings } from "@/lib/data";
+import { getCurrentMemberships, getOrganizationById } from "@/lib/ngo-data";
+import { createClient } from "@/lib/supabase/server";
 import { AllocationPolicyBar } from "@/components/org/allocation-policy-bar";
 
-export default function OrgSettingsPage() {
-  const { organizationId } = useCurrentUser();
+export default async function OrgSettingsPage() {
+  const { organizationId } = await getCurrentMemberships();
   if (!organizationId) return null;
-  const org = getOrganizationById(organizationId)!;
+  const org = await getOrganizationById(organizationId);
+  if (!org) return null;
+
+  const supabase = await createClient();
+  const { data: settingsRow } = await supabase.from("platform_settings").select("platform_fee_pct").eq("id", true).maybeSingle();
+  const platformFeePct = Number(settingsRow?.platform_fee_pct ?? 0.01);
 
   return (
     <div className="max-w-2xl space-y-6">
@@ -72,7 +75,7 @@ export default function OrgSettingsPage() {
       </div>
 
       <div className="rounded-2xl border border-border bg-card p-6 text-sm text-muted-foreground">
-        Current GiveTrail platform fee: <span className="font-medium text-foreground">{(platformSettings.platformFeePct * 100).toFixed(1)}%</span> per
+        Current GiveTrail platform fee: <span className="font-medium text-foreground">{(platformFeePct * 100).toFixed(1)}%</span> per
         donation, set by GiveTrail and shown to donors at checkout.
       </div>
     </div>

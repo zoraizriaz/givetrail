@@ -1,9 +1,12 @@
 import { ExploreClient } from "@/components/explore/explore-client";
-import { exploreOrganizations, exploreCampaigns } from "@/lib/data";
+import { exploreOrganizations, exploreCampaigns, getOrgTransparency } from "@/lib/supabase-data";
 
-export default function ExplorePage() {
-  const organizations = exploreOrganizations();
-  const campaigns = exploreCampaigns();
+export default async function ExplorePage() {
+  const [organizations, campaigns] = await Promise.all([exploreOrganizations(), exploreCampaigns()]);
+  const fundsReceivedEntries = await Promise.all(
+    organizations.map(async (o) => [o.id, (await getOrgTransparency(o.id, o.baseCurrency, o.allocationPolicy.programPct)).fundsReceived] as const)
+  );
+  const fundsReceivedByOrgId = Object.fromEntries(fundsReceivedEntries);
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
@@ -19,7 +22,7 @@ export default function ExplorePage() {
       </div>
 
       <div className="mt-10">
-        <ExploreClient organizations={organizations} campaigns={campaigns} />
+        <ExploreClient organizations={organizations} campaigns={campaigns} fundsReceivedByOrgId={fundsReceivedByOrgId} />
       </div>
     </div>
   );

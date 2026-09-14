@@ -3,10 +3,10 @@ import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SectionEyebrow } from "@/components/shared/money";
 import { HomeTrailVisual } from "@/components/home/trail-visual";
-import { getDonationTrail } from "@/lib/data";
+import { getSampleDonationTrail } from "@/lib/supabase-data";
 
-export function Hero() {
-  const trail = getDonationTrail("don-hero-1")!;
+export async function Hero() {
+  const trail = await getSampleDonationTrail();
 
   return (
     <section className="relative overflow-hidden border-b border-border">
@@ -33,17 +33,19 @@ export function Hero() {
           </div>
         </div>
 
-        <div className="mx-auto mt-16 max-w-4xl" data-tour="hero-trail-visual">
-          <HomeTrailVisual
-            currency={trail.donation.currency}
-            grossAmount={trail.donation.grossAmount}
-            platformFee={trail.donation.platformFee}
-            amountReceivedByOrg={trail.donation.amountReceivedByOrg}
-            programAllocation={trail.programAllocation}
-            verifiedExpenditure={trail.allocatedToExpenditures}
-            pctAccountedFor={trail.pctOfProgramAllocationUtilized}
-          />
-        </div>
+        {trail && (
+          <div className="mx-auto mt-16 max-w-4xl" data-tour="hero-trail-visual">
+            <HomeTrailVisual
+              currency={trail.donation.currency}
+              grossAmount={trail.donation.grossAmount}
+              platformFee={trail.donation.platformFee}
+              amountReceivedByOrg={trail.donation.amountReceivedByOrg}
+              programAllocation={trail.programAllocation}
+              verifiedExpenditure={trail.allocatedToExpenditures}
+              pctAccountedFor={trail.pctOfProgramAllocationUtilized}
+            />
+          </div>
+        )}
       </div>
     </section>
   );

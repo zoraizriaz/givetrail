@@ -1,12 +1,9 @@
-"use client";
-
 import Link from "next/link";
-import { useCurrentUser } from "@/context/current-user-context";
-import { getGrantsByCompany, getOrganizationById } from "@/lib/data";
+import { HandCoins } from "lucide-react";
+import { getCurrentMemberships, getGrantsByCompany, getOrganizationById } from "@/lib/ngo-data";
 import { Money } from "@/components/shared/money";
 import { Progress } from "@/components/ui/progress";
 import { EmptyState } from "@/components/shared/empty-state";
-import { HandCoins } from "lucide-react";
 
 const STATUS_LABEL: Record<string, string> = {
   pending_transfer: "Pending Transfer",
@@ -15,10 +12,13 @@ const STATUS_LABEL: Record<string, string> = {
   closed: "Closed",
 };
 
-export default function CorporateGrantsPage() {
-  const { companyId } = useCurrentUser();
+export default async function CorporateGrantsPage() {
+  const { companyId } = await getCurrentMemberships();
   if (!companyId) return null;
-  const grants = getGrantsByCompany(companyId);
+  const grants = await getGrantsByCompany(companyId);
+  const orgsById = new Map(
+    await Promise.all(Array.from(new Set(grants.map((g) => g.organizationId))).map(async (id) => [id, await getOrganizationById(id)] as const))
+  );
 
   return (
     <div>
@@ -30,7 +30,7 @@ export default function CorporateGrantsPage() {
       ) : (
         <div className="mt-6 space-y-3">
           {grants.map((grant) => {
-            const org = getOrganizationById(grant.organizationId);
+            const org = orgsById.get(grant.organizationId);
             const pct = grant.amountTransferred > 0 ? Math.min(100, (grant.amountUtilized / grant.amountTransferred) * 100) : 0;
             return (
               <Link

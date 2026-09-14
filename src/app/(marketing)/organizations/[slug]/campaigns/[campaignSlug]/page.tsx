@@ -1,6 +1,3 @@
-"use client";
-
-import { use } from "react";
 import Link from "next/link";
 import { CalendarDays, MapPin, Megaphone } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -9,22 +6,16 @@ import { Money } from "@/components/shared/money";
 import { EmptyState } from "@/components/shared/empty-state";
 import { CATEGORY_META } from "@/lib/category-meta";
 import { formatDate } from "@/lib/utils/format";
-import { getOrganizationBySlug, getCampaignsByOrg } from "@/lib/data";
-import { applyRuntimeOverrides } from "@/lib/runtime-overrides";
-import { useMounted } from "@/lib/use-mounted";
+import { getVerifiedOrganizationBySlug, getCampaignBySlug } from "@/lib/supabase-data";
 
-export default function CampaignDetailPage({
+export default async function CampaignDetailPage({
   params,
 }: {
   params: Promise<{ slug: string; campaignSlug: string }>;
 }) {
-  const { slug, campaignSlug } = use(params);
-  const mounted = useMounted();
-  if (!mounted) return null;
-
-  applyRuntimeOverrides();
-  const organization = getOrganizationBySlug(slug);
-  const campaign = organization ? getCampaignsByOrg(organization.id).find((c) => c.slug === campaignSlug) : undefined;
+  const { slug, campaignSlug } = await params;
+  const organization = await getVerifiedOrganizationBySlug(slug);
+  const campaign = organization ? await getCampaignBySlug(organization.id, campaignSlug) : undefined;
   if (!organization || !campaign) {
     return <EmptyState icon={Megaphone} title="Campaign not found" className="mx-auto mt-20 max-w-lg" />;
   }

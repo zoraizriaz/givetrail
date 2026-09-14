@@ -12,9 +12,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { cn } from "@/lib/utils";
 import { Money } from "@/components/shared/money";
 import { ALL_CURRENCIES } from "@/lib/utils/currency";
-import { buildDonationFinancials } from "@/lib/mock-data/helpers";
-import { platformSettings } from "@/lib/data";
-import { createSessionDonation } from "@/lib/session-donations";
+import { buildDonationFinancials, DEFAULT_PLATFORM_FEE_PCT } from "@/lib/mock-data/helpers";
+import { createDonation } from "@/lib/actions/donations";
 import { useCurrentUser } from "@/context/current-user-context";
 import type { Campaign, Currency, Organization, PaymentMethod } from "@/lib/types";
 
@@ -32,10 +31,12 @@ export function CheckoutForm({
   organization,
   campaigns,
   preselectedCampaignId,
+  platformFeePct = DEFAULT_PLATFORM_FEE_PCT,
 }: {
   organization: Organization;
   campaigns: Campaign[];
   preselectedCampaignId?: string;
+  platformFeePct?: number;
 }) {
   const router = useRouter();
   const { user } = useCurrentUser();
@@ -51,28 +52,29 @@ export function CheckoutForm({
   const [submitting, setSubmitting] = useState(false);
 
   const effectiveAmount = customAmount ? Number(customAmount) || 0 : amount;
-  const financials = useMemo(() => buildDonationFinancials(effectiveAmount || 0, method, platformSettings.platformFeePct), [effectiveAmount, method]);
+  const financials = useMemo(() => buildDonationFinancials(effectiveAmount || 0, method, platformFeePct), [effectiveAmount, method, platformFeePct]);
 
   const selectedCampaign = campaigns.find((c) => c.id === designationId);
   const canSubmit = effectiveAmount > 0 && name.trim().length > 1 && /\S+@\S+\.\S+/.test(email);
 
-  function handleSubmit() {
+  async function handleSubmit() {
     if (!canSubmit || submitting) return;
     setSubmitting(true);
-    const record = createSessionDonation({
-      donorUserId: user?.id ?? `guest-${Date.now()}`,
-      donorName: name,
-      donorEmail: email,
-      organizationId: organization.id,
-      designation: selectedCampaign ? { type: "campaign", campaignId: selectedCampaign.id } : { type: "general_fund" },
-      grossMajor: effectiveAmount,
-      currency,
-      method,
-      isAnonymous,
-    });
-    setTimeout(() => {
-      router.push(`/donate/success/${record.donation.id}`);
-    }, 700);
+    try {
+      const { donationId } = await createDonation({
+        organizationId: organization.id,
+        designation: selectedCampaign ? { type: "campaign", campaignId: selectedCampaign.id } : { type: "general_fund" },
+        donorName: name,
+        donorEmail: email,
+        grossMajor: effectiveAmount,
+        currency,
+        method,
+        isAnonymous,
+      });
+      router.push(`/donate/success/${donationId}`);
+    } catch {
+      setSubmitting(false);
+    }
   }
 
   return (
@@ -215,7 +217,7 @@ export function CheckoutForm({
             <Money amount={financials.grossAmount} currency={currency} className="font-medium text-foreground" />
           </div>
           <div className="flex justify-between text-muted-foreground">
-            <span>GiveTrail fee ({(platformSettings.platformFeePct * 100).toFixed(0)}%)</span>
+            <span>GiveTrail fee ({(financials.platformFeePct * 100).toFixed(0)}%)</span>
             <span>
               −<Money amount={financials.platformFee} currency={currency} />
             </span>

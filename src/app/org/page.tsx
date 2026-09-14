@@ -1,9 +1,6 @@
-"use client";
-
 import Link from "next/link";
 import { AlertCircle, Banknote, FileWarning, Landmark, ShieldCheck, Users, Wallet } from "lucide-react";
-import { useCurrentUser } from "@/context/current-user-context";
-import { getOrgDashboard } from "@/lib/data";
+import { getCurrentMemberships, getOrgDashboard } from "@/lib/ngo-data";
 import { StatCard } from "@/components/shared/stat-card";
 import { EmptyState } from "@/components/shared/empty-state";
 import { MiniBarChart } from "@/components/shared/mini-bar-chart";
@@ -13,14 +10,14 @@ import { formatMoney } from "@/lib/utils/currency";
 import { PageTour } from "@/components/tour/page-tour";
 import { orgDashboardTourSteps } from "@/components/tour/steps";
 
-export default function OrgDashboardPage() {
-  const { organizationId } = useCurrentUser();
+export default async function OrgDashboardPage() {
+  const { organizationId } = await getCurrentMemberships();
 
   if (!organizationId) {
     return <EmptyState icon={Landmark} title="No organization linked" description="Log in as an NGO administrator to see this dashboard." />;
   }
 
-  const dash = getOrgDashboard(organizationId);
+  const dash = await getOrgDashboard(organizationId);
   const currency = dash.transparency.currency;
 
   return (

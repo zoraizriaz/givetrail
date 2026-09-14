@@ -1,47 +1,73 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { GitBranch } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Money } from "@/components/shared/money";
 import { EmptyState } from "@/components/shared/empty-state";
 import { useCurrentUser } from "@/context/current-user-context";
-import { getAllocatableExpenses, getEligibleSourcesForExpense, recordAllocation } from "@/lib/data";
+import { fetchAllocatableExpenses, fetchEligibleSourcesForExpense, recordAllocation } from "@/lib/actions/ngo";
 import { toMinorUnits } from "@/lib/utils/currency";
 import { toast } from "sonner";
-import type { Currency } from "@/lib/types";
-import { persistAllocationOverride } from "@/lib/runtime-overrides";
+import type { Currency, Expense } from "@/lib/types";
 import { PageTour } from "@/components/tour/page-tour";
 import { orgAllocationsTourSteps } from "@/components/tour/steps";
+
+interface EligibleSource {
+  key: string;
+  sourceType: "donation" | "grant";
+  sourceId: string;
+  label: string;
+  available: number;
+}
 
 export default function OrgAllocationsPage() {
   const { organizationId } = useCurrentUser();
   const [refreshKey, setRefreshKey] = useState(0);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [inputs, setInputs] = useState<Record<string, string>>({});
+  const [expenses, setExpenses] = useState<Expense[]>([]);
+  const [sources, setSources] = useState<EligibleSource[]>([]);
 
-  const expenses = useMemo(() => (organizationId ? getAllocatableExpenses(organizationId) : []), [organizationId, refreshKey]);
+  useEffect(() => {
+    if (!organizationId) return;
+    fetchAllocatableExpenses(organizationId).then(setExpenses);
+  }, [organizationId, refreshKey]);
+
   const selected = expenses.find((e) => e.id === selectedId) ?? expenses[0] ?? null;
-  const sources = useMemo(() => (selected ? getEligibleSourcesForExpense(selected.id) : { donations: [], grants: [] }), [selected, refreshKey]);
+
+  useEffect(() => {
+    if (!selected) {
+      setSources([]);
+      return;
+    }
+    let active = true;
+    fetchEligibleSourcesForExpense(selected.id).then(({ donations, grants }) => {
+      if (!active) return;
+      setSources([
+        ...donations.map((d) => ({ key: `donation:${d.donation.id}`, sourceType: "donation" as const, sourceId: d.donation.id, label: `Donation ${d.donation.id}`, available: d.available })),
+        ...grants.map((g) => ({ key: `grant:${g.grant.id}`, sourceType: "grant" as const, sourceId: g.grant.id, label: g.grant.title, available: g.available })),
+      ]);
+    });
+    return () => {
+      active = false;
+    };
+  }, [selected, refreshKey]);
 
   if (!organizationId) return null;
 
   const needed = selected ? selected.amount - selected.amountAllocated : 0;
   const enteredTotal = Object.values(inputs).reduce((sum, v) => sum + (Number(v) || 0), 0) * 100;
 
-  function handleSave() {
+  async function handleSave() {
     if (!selected) return;
     let totalRecorded = 0;
     for (const [sourceKey, value] of Object.entries(inputs)) {
       const amountMajor = Number(value);
       if (!amountMajor || amountMajor <= 0) continue;
       const [sourceType, sourceId] = sourceKey.split(":") as ["donation" | "grant", string];
-      const desiredAmount = toMinorUnits(amountMajor);
-      const actual = recordAllocation(selected.id, sourceType, sourceId, desiredAmount);
-      if (actual > 0) {
-        persistAllocationOverride({ expenseId: selected.id, sourceType, sourceId, desiredAmount });
-      }
+      const actual = await recordAllocation(selected.id, sourceType, sourceId, toMinorUnits(amountMajor));
       totalRecorded += actual;
     }
     if (totalRecorded > 0) {
@@ -98,31 +124,19 @@ export default function OrgAllocationsPage() {
               <p className="text-xs text-muted-foreground">Amount still needing allocation</p>
 
               <div className="mt-5 space-y-4">
-                {sources.donations.length === 0 && sources.grants.length === 0 ? (
+                {sources.length === 0 ? (
                   <p className="text-sm text-muted-foreground">No eligible donations or grants are available to allocate right now.</p>
                 ) : (
-                  <>
-                    {sources.donations.map(({ donation, available }) => (
-                      <SourceRow
-                        key={donation.id}
-                        label={`Donation ${donation.id}`}
-                        available={available}
-                        currency={selected.currency}
-                        value={inputs[`donation:${donation.id}`] ?? ""}
-                        onChange={(v) => setInputs((s) => ({ ...s, [`donation:${donation.id}`]: v }))}
-                      />
-                    ))}
-                    {sources.grants.map(({ grant, available }) => (
-                      <SourceRow
-                        key={grant.id}
-                        label={grant.title}
-                        available={available}
-                        currency={selected.currency}
-                        value={inputs[`grant:${grant.id}`] ?? ""}
-                        onChange={(v) => setInputs((s) => ({ ...s, [`grant:${grant.id}`]: v }))}
-                      />
-                    ))}
-                  </>
+                  sources.map((s) => (
+                    <SourceRow
+                      key={s.key}
+                      label={s.label}
+                      available={s.available}
+                      currency={selected.currency}
+                      value={inputs[s.key] ?? ""}
+                      onChange={(v) => setInputs((state) => ({ ...state, [s.key]: v }))}
+                    />
+                  ))
                 )}
               </div>
 

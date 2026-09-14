@@ -1,30 +1,18 @@
-"use client";
-
-import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { useCurrentUser } from "@/context/current-user-context";
-import { getCampaignsByOrg } from "@/lib/data";
-import { getSessionCampaigns } from "@/lib/session-campaigns";
+import { getCurrentMemberships, getCampaignsByOrg } from "@/lib/ngo-data";
 import { Money } from "@/components/shared/money";
 import { EmptyState } from "@/components/shared/empty-state";
 import { Megaphone } from "lucide-react";
-import type { Campaign } from "@/lib/types";
 
 const STATUS_LABEL: Record<string, string> = { draft: "Draft", active: "Active", completed: "Completed", paused: "Paused" };
 
-export default function OrgCampaignsPage() {
-  const { organizationId } = useCurrentUser();
-  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
-
-  useEffect(() => {
-    if (!organizationId) return;
-    setCampaigns([...getSessionCampaigns(organizationId), ...getCampaignsByOrg(organizationId)]);
-  }, [organizationId]);
-
+export default async function OrgCampaignsPage() {
+  const { organizationId } = await getCurrentMemberships();
   if (!organizationId) return null;
+  const campaigns = await getCampaignsByOrg(organizationId);
 
   return (
     <div>

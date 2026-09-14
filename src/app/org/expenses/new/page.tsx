@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Check, FileUp } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -11,18 +11,38 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import { useCurrentUser } from "@/context/current-user-context";
-import { getOrganizationById, getCampaignsByOrg } from "@/lib/data";
-import { createSessionExpense } from "@/lib/session-expenses";
+import { createClient } from "@/lib/supabase/client";
+import { createExpense } from "@/lib/actions/ngo";
 import { EXPENSE_CATEGORY_LABELS } from "@/lib/expense-category-meta";
-import type { ExpenseCategory } from "@/lib/types";
+import type { Campaign, Currency, ExpenseCategory } from "@/lib/types";
 
 const CATEGORIES = Object.keys(EXPENSE_CATEGORY_LABELS) as ExpenseCategory[];
 
 export default function NewExpensePage() {
   const router = useRouter();
   const { organizationId } = useCurrentUser();
-  const org = organizationId ? getOrganizationById(organizationId) : undefined;
-  const campaigns = organizationId ? getCampaignsByOrg(organizationId) : [];
+  const [baseCurrency, setBaseCurrency] = useState<Currency>("USD");
+  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
+
+  useEffect(() => {
+    if (!organizationId) return;
+    const supabase = createClient();
+    supabase
+      .from("organizations")
+      .select("base_currency")
+      .eq("id", organizationId)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (data) setBaseCurrency(data.base_currency as Currency);
+      });
+    supabase
+      .from("campaigns")
+      .select("id, title")
+      .eq("organization_id", organizationId)
+      .then(({ data }) => {
+        setCampaigns((data ?? []).map((c) => ({ id: c.id, title: c.title }) as Campaign));
+      });
+  }, [organizationId]);
 
   const [title, setTitle] = useState("");
   const [vendor, setVendor] = useState("");
@@ -36,33 +56,35 @@ export default function NewExpensePage() {
   const [referenceNumber, setReferenceNumber] = useState("");
   const [beneficiaryProtected, setBeneficiaryProtected] = useState(false);
   const [receiptAttached, setReceiptAttached] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
-  if (!org) return null;
+  if (!organizationId) return null;
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const expense = createSessionExpense({
-      organizationId: org!.id,
-      campaignId: campaignId === "none" ? undefined : campaignId,
-      title,
-      vendor,
-      expenseDate: new Date(date).toISOString(),
-      amountMajor: Number(amount) || 0,
-      currency: org!.baseCurrency,
-      category,
-      description,
-      donorSafeDescription: donorSafeDescription || description,
-      paymentMethod,
-      referenceNumber,
-      beneficiaryProtected,
-    });
-    if (receiptAttached) {
-      expense.verificationLevel = "documented";
-      expense.evidence = [
-        { id: `${expense.id}-ev-1`, expenseId: expense.id, type: "receipt", fileName: "receipt.pdf", uploadedAt: new Date().toISOString(), donorVisible: true, redacted: false },
-      ];
+    if (!organizationId || submitting) return;
+    setSubmitting(true);
+    try {
+      const { expenseId } = await createExpense({
+        organizationId,
+        campaignId: campaignId === "none" ? undefined : campaignId,
+        title,
+        vendor,
+        expenseDate: new Date(date).toISOString(),
+        amountMajor: Number(amount) || 0,
+        currency: baseCurrency,
+        category,
+        description,
+        donorSafeDescription: donorSafeDescription || description,
+        paymentMethod,
+        referenceNumber,
+        beneficiaryProtected,
+        receiptAttached,
+      });
+      router.push(`/org/expenses/${expenseId}`);
+    } finally {
+      setSubmitting(false);
     }
-    router.push(`/org/expenses/${expense.id}`);
   }
 
   return (
@@ -87,7 +109,7 @@ export default function NewExpensePage() {
             <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} required />
           </div>
           <div className="space-y-1.5">
-            <Label>Amount ({org.baseCurrency})</Label>
+            <Label>Amount ({baseCurrency})</Label>
             <Input value={amount} onChange={(e) => setAmount(e.target.value.replace(/[^0-9.]/g, ""))} required inputMode="decimal" />
           </div>
         </div>
@@ -168,8 +190,8 @@ export default function NewExpensePage() {
           </button>
         </div>
 
-        <Button type="submit" className="w-full">
-          Save expense
+        <Button type="submit" className="w-full" disabled={submitting}>
+          {submitting ? "Saving…" : "Save expense"}
         </Button>
       </form>
     </div>

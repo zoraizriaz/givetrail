@@ -1,16 +1,13 @@
-"use client";
-
-import { useCurrentUser } from "@/context/current-user-context";
-import { getOrgDashboard } from "@/lib/data";
+import { getCurrentMemberships, getOrgDashboard } from "@/lib/ngo-data";
 import { Money } from "@/components/shared/money";
 import { AllocationPolicyBar } from "@/components/org/allocation-policy-bar";
 import { EXPENSE_CATEGORY_LABELS, VERIFICATION_LEVEL_LABELS } from "@/lib/expense-category-meta";
 import { formatDate } from "@/lib/utils/format";
 
-export default function OrgReportsPage() {
-  const { organizationId } = useCurrentUser();
+export default async function OrgReportsPage() {
+  const { organizationId } = await getCurrentMemberships();
   if (!organizationId) return null;
-  const dash = getOrgDashboard(organizationId);
+  const dash = await getOrgDashboard(organizationId);
   const currency = dash.transparency.currency;
   const today = formatDate(new Date().toISOString());
 

@@ -1,12 +1,10 @@
-"use client";
-
-import { donations, getOrganizationById, getUserById, getPaymentByDonationId } from "@/lib/data";
+import { getAllDonationsForAdmin } from "@/lib/ngo-data";
 import { Money } from "@/components/shared/money";
 import { PAYMENT_STATUS_META } from "@/lib/payment-status-meta";
 import { formatDateShort } from "@/lib/utils/format";
 
-export default function AdminTransactionsPage() {
-  const sorted = [...donations].sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));
+export default async function AdminTransactionsPage() {
+  const rows = await getAllDonationsForAdmin();
 
   return (
     <div>
@@ -26,11 +24,8 @@ export default function AdminTransactionsPage() {
             </tr>
           </thead>
           <tbody>
-            {sorted.map((d) => {
-              const donor = getUserById(d.donorUserId);
-              const org = getOrganizationById(d.organizationId);
-              const status = getPaymentByDonationId(d.id)?.status;
-              const statusMeta = status ? PAYMENT_STATUS_META[status] : undefined;
+            {rows.map(({ donation: d, paymentStatus, donor, organization: org }) => {
+              const statusMeta = paymentStatus ? PAYMENT_STATUS_META[paymentStatus] : undefined;
               return (
                 <tr key={d.id} className="border-b border-border/70 last:border-0 hover:bg-accent/30">
                   <td className="px-4 py-3 text-foreground">{d.isAnonymous ? "Anonymous" : donor?.fullName ?? "—"}</td>

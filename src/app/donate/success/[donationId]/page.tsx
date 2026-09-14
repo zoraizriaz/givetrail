@@ -1,30 +1,26 @@
-"use client";
-
-import { use, useEffect, useState } from "react";
 import Link from "next/link";
 import { ArrowRight, CheckCircle2, CircleDashed, Route } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/shared/logo";
 import { Money } from "@/components/shared/money";
-import { getSessionDonation, computeSessionDonationTrail, type SessionDonationRecord } from "@/lib/session-donations";
-import { useCurrentUser } from "@/context/current-user-context";
+import { getDonationTrail, canViewDonation } from "@/lib/supabase-data";
+import { createClient } from "@/lib/supabase/server";
 
-export default function DonationSuccessPage({ params }: { params: Promise<{ donationId: string }> }) {
-  const { donationId } = use(params);
-  const { user } = useCurrentUser();
-  const [record, setRecord] = useState<SessionDonationRecord | undefined | null>(null);
+export default async function DonationSuccessPage({ params }: { params: Promise<{ donationId: string }> }) {
+  const { donationId } = await params;
+  const supabase = await createClient();
+  const {
+    data: { user: authUser },
+  } = await supabase.auth.getUser();
 
-  useEffect(() => {
-    setRecord(getSessionDonation(donationId) ?? undefined);
-  }, [donationId]);
+  const trail = await getDonationTrail(donationId);
+  const visible = trail && canViewDonation(trail.donation, authUser?.id);
 
-  if (record === null) return null;
-
-  if (!record) {
+  if (!visible) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-4 px-4 text-center">
         <p className="font-heading text-xl font-semibold text-foreground">We couldn&rsquo;t find that donation</p>
-        <p className="text-sm text-muted-foreground">It may have been from a different browser session.</p>
+        <p className="text-sm text-muted-foreground">Double-check the link, or start a new donation.</p>
         <Button asChild>
           <Link href="/explore">Explore causes</Link>
         </Button>
@@ -32,7 +28,7 @@ export default function DonationSuccessPage({ params }: { params: Promise<{ dona
     );
   }
 
-  const trail = computeSessionDonationTrail(record);
+  const firstName = trail.donorName?.split(" ")[0];
 
   return (
     <div className="min-h-screen trail-gradient-bg">
@@ -45,7 +41,9 @@ export default function DonationSuccessPage({ params }: { params: Promise<{ dona
           <CheckCircle2 className="size-8 text-success" />
         </div>
         <h1 className="mt-6 font-heading text-3xl font-semibold text-foreground sm:text-4xl">Your giving trail has started.</h1>
-        <p className="mt-3 text-muted-foreground">Thank you, {record.donorName.split(" ")[0]}. Here&rsquo;s exactly what happens next.</p>
+        <p className="mt-3 text-muted-foreground">
+          {firstName ? `Thank you, ${firstName}. ` : "Thank you. "}Here&rsquo;s exactly what happens next.
+        </p>
 
         <div className="mt-10 w-full rounded-3xl border border-border bg-background p-8 text-left trail-card-shadow">
           <div className="flex items-center justify-between border-b border-border pb-5">
@@ -79,7 +77,7 @@ export default function DonationSuccessPage({ params }: { params: Promise<{ dona
           </Link>
         </Button>
 
-        {!user && (
+        {!authUser && (
           <p className="mt-4 text-sm text-muted-foreground">
             Want to track this and future donations from one place?{" "}
             <Link href="/signup" className="font-medium text-primary hover:underline">

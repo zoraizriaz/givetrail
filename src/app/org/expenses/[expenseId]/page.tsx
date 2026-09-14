@@ -1,42 +1,32 @@
-"use client";
-
-import { use, useEffect, useState } from "react";
 import Link from "next/link";
 import { ChevronLeft, FileText, Lock, Receipt } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Money } from "@/components/shared/money";
 import { VerificationLevelBadge } from "@/components/shared/verification-badge";
 import { EmptyState } from "@/components/shared/empty-state";
-import { getExpenseByIdAnywhere } from "@/lib/session-expenses";
-import { persistExpenseLevelOverride } from "@/lib/runtime-overrides";
-import { getAllocationsForExpense, getDonationById, getGrantById } from "@/lib/data";
+import { getExpenseById, getAllocationsForExpense } from "@/lib/ngo-data";
+import { AdvanceVerificationButton } from "@/components/org/advance-verification-button";
+import { createClient } from "@/lib/supabase/server";
 import { formatDate } from "@/lib/utils/format";
-import { VERIFICATION_LEVEL_LABELS } from "@/lib/expense-category-meta";
-import type { Expense, VerificationLevel } from "@/lib/types";
+import type { VerificationLevel } from "@/lib/types";
 
 const LEVEL_ORDER: VerificationLevel[] = ["declared", "documented", "financially_verified", "program_verified", "independently_verified"];
 
-export default function ExpenseDetailPage({ params }: { params: Promise<{ expenseId: string }> }) {
-  const { expenseId } = use(params);
-  const [expense, setExpense] = useState<Expense | undefined | null>(null);
-
-  useEffect(() => {
-    setExpense(getExpenseByIdAnywhere(expenseId));
-  }, [expenseId]);
-
-  if (expense === null) return null;
+export default async function ExpenseDetailPage({ params }: { params: Promise<{ expenseId: string }> }) {
+  const { expenseId } = await params;
+  const expense = await getExpenseById(expenseId);
   if (!expense) return <EmptyState icon={Receipt} title="Expense not found" />;
 
-  const allocations = getAllocationsForExpense(expense.id);
+  const allocations = await getAllocationsForExpense(expense.id);
   const currentIndex = LEVEL_ORDER.indexOf(expense.verificationLevel);
   const nextLevel = LEVEL_ORDER[currentIndex + 1];
 
-  function advanceLevel() {
-    if (!nextLevel || !expense) return;
-    expense.verificationLevel = nextLevel;
-    persistExpenseLevelOverride(expense.id, nextLevel);
-    setExpense({ ...expense });
-  }
+  const supabase = await createClient();
+  const grantIds = allocations.filter((a) => a.sourceType === "grant").map((a) => a.sourceId);
+  const [{ data: grantRows }] = await Promise.all([
+    grantIds.length > 0 ? supabase.from("grants").select("id, title").in("id", grantIds) : Promise.resolve({ data: [] }),
+  ]);
+  const grantTitleById = new Map((grantRows ?? []).map((g) => [g.id as string, g.title as string]));
 
   return (
     <div className="max-w-3xl">
@@ -100,9 +90,7 @@ export default function ExpenseDetailPage({ params }: { params: Promise<{ expens
               <VerificationLevelBadge level={expense.verificationLevel} variant="full" />
             </div>
             {nextLevel ? (
-              <Button size="sm" variant="outline" className="mt-4 w-full" onClick={advanceLevel}>
-                Advance to {VERIFICATION_LEVEL_LABELS[nextLevel]}
-              </Button>
+              <AdvanceVerificationButton expenseId={expense.id} nextLevel={nextLevel} />
             ) : (
               <p className="mt-4 text-xs text-muted-foreground">This expense has reached the highest verification level.</p>
             )}
@@ -121,8 +109,7 @@ export default function ExpenseDetailPage({ params }: { params: Promise<{ expens
             {allocations.length > 0 && (
               <div className="mt-4 space-y-2 border-t border-border pt-4">
                 {allocations.map((a) => {
-                  const label =
-                    a.sourceType === "donation" ? getDonationById(a.sourceId)?.id ?? a.sourceId : getGrantById(a.sourceId)?.title ?? a.sourceId;
+                  const label = a.sourceType === "donation" ? `Donation ${a.sourceId}` : grantTitleById.get(a.sourceId) ?? a.sourceId;
                   return (
                     <div key={a.id} className="flex items-center justify-between text-xs">
                       <span className="text-muted-foreground">

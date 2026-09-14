@@ -1,34 +1,22 @@
-"use client";
-
-import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
 import { Plus, Receipt } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useCurrentUser } from "@/context/current-user-context";
-import { getExpensesByOrg } from "@/lib/data";
-import { getSessionExpenses } from "@/lib/session-expenses";
+import { getCurrentMemberships, getExpensesByOrg } from "@/lib/ngo-data";
 import { Money } from "@/components/shared/money";
 import { VerificationLevelBadge } from "@/components/shared/verification-badge";
 import { EmptyState } from "@/components/shared/empty-state";
 import { formatDateShort } from "@/lib/utils/format";
 import { PageTour } from "@/components/tour/page-tour";
 import { orgExpensesTourSteps } from "@/components/tour/steps";
-import type { Expense, VerificationLevel } from "@/lib/types";
+import type { VerificationLevel } from "@/lib/types";
 
-function OrgExpensesInner() {
-  const { organizationId } = useCurrentUser();
-  const searchParams = useSearchParams();
-  const statusFilter = searchParams.get("status") as VerificationLevel | null;
-  const [expenses, setExpenses] = useState<Expense[]>([]);
-
-  useEffect(() => {
-    if (!organizationId) return;
-    setExpenses([...getSessionExpenses(organizationId), ...getExpensesByOrg(organizationId)]);
-  }, [organizationId]);
-
+export default async function OrgExpensesPage({ searchParams }: { searchParams: Promise<{ status?: string }> }) {
+  const { status } = await searchParams;
+  const statusFilter = (status as VerificationLevel | undefined) ?? null;
+  const { organizationId } = await getCurrentMemberships();
   if (!organizationId) return null;
 
+  const expenses = await getExpensesByOrg(organizationId);
   const filtered = statusFilter ? expenses.filter((e) => e.verificationLevel === statusFilter) : expenses;
 
   return (
@@ -86,13 +74,5 @@ function OrgExpensesInner() {
       )}
       <PageTour tourId="org-expenses" steps={orgExpensesTourSteps} />
     </div>
-  );
-}
-
-export default function OrgExpensesPage() {
-  return (
-    <Suspense>
-      <OrgExpensesInner />
-    </Suspense>
   );
 }

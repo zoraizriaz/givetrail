@@ -1,16 +1,15 @@
-"use client";
-
 import { FileBarChart } from "lucide-react";
-import { useCurrentUser } from "@/context/current-user-context";
-import { getCorporateDashboard, getGrantDetail } from "@/lib/data";
+import { getCurrentMemberships, getCorporateDashboard, getGrantDetail } from "@/lib/ngo-data";
 import { Money } from "@/components/shared/money";
 import { EmptyState } from "@/components/shared/empty-state";
 
-export default function CorporateReportsPage() {
-  const { companyId } = useCurrentUser();
+export default async function CorporateReportsPage() {
+  const { companyId } = await getCurrentMemberships();
   if (!companyId) return null;
-  const dash = getCorporateDashboard(companyId);
+  const dash = await getCorporateDashboard(companyId);
   if (!dash.company) return null;
+
+  const grantDetails = await Promise.all(dash.activeGrants.map((g) => getGrantDetail(g.id)));
 
   return (
     <div className="max-w-3xl">
@@ -27,9 +26,9 @@ export default function CorporateReportsPage() {
         {dash.activeGrants.length === 0 ? (
           <EmptyState icon={FileBarChart} title="No active grants" />
         ) : (
-          dash.activeGrants.map((grant) => {
-            const detail = getGrantDetail(grant.id);
+          grantDetails.map((detail) => {
             if (!detail) return null;
+            const { grant } = detail;
             return (
               <div key={grant.id} className="rounded-2xl border border-border bg-card p-6 trail-card-shadow">
                 <div className="flex items-center justify-between">

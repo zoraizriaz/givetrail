@@ -10,13 +10,14 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import { ALL_CURRENCIES } from "@/lib/utils/currency";
-import { useCurrentUser } from "@/context/current-user-context";
+import { DEMO_PASSWORD } from "@/context/current-user-context";
+import { createClient } from "@/lib/supabase/client";
 
 const STEPS = ["Organization", "Representative", "Mission & Programs", "Banking & Documents", "Review"];
 
 export default function NgoOnboardingPage() {
   const router = useRouter();
-  const { setCurrentUserId } = useCurrentUser();
+  const supabase = createClient();
   const [step, setStep] = useState(0);
   const [submitted, setSubmitted] = useState(false);
   const [form, setForm] = useState({
@@ -56,9 +57,10 @@ export default function NgoOnboardingPage() {
         </p>
         <Button
           className="mt-6 w-full"
-          onClick={() => {
-            setCurrentUserId("u-org-maria");
+          onClick={async () => {
+            await supabase.auth.signInWithPassword({ email: "maria.santos@horizonhealth.org", password: DEMO_PASSWORD });
             router.push("/org/verification");
+            router.refresh();
           }}
         >
           Preview NGO dashboard

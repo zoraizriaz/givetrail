@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -8,37 +8,60 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useCurrentUser } from "@/context/current-user-context";
-import { getOrganizationById } from "@/lib/data";
-import { createSessionCampaign } from "@/lib/session-campaigns";
+import { createClient } from "@/lib/supabase/client";
+import { createCampaign } from "@/lib/actions/ngo";
 import { CATEGORY_META, ALL_CATEGORIES } from "@/lib/category-meta";
-import type { OrgCategory } from "@/lib/types";
+import type { Currency, OrgCategory } from "@/lib/types";
 
 export default function NewCampaignPage() {
   const router = useRouter();
   const { organizationId } = useCurrentUser();
-  const org = organizationId ? getOrganizationById(organizationId) : undefined;
+  const [baseCurrency, setBaseCurrency] = useState<Currency>("USD");
+  const [operatingCountry, setOperatingCountry] = useState("");
+
+  useEffect(() => {
+    if (!organizationId) return;
+    const supabase = createClient();
+    supabase
+      .from("organizations")
+      .select("base_currency, operating_country")
+      .eq("id", organizationId)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (data) {
+          setBaseCurrency(data.base_currency as Currency);
+          setOperatingCountry(data.operating_country as string);
+        }
+      });
+  }, [organizationId]);
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState<OrgCategory>("health");
   const [location, setLocation] = useState("");
   const [goal, setGoal] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
-  if (!org) return null;
+  if (!organizationId) return null;
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const campaign = createSessionCampaign({
-      organizationId: org!.id,
-      title,
-      description,
-      category,
-      location,
-      currency: org!.baseCurrency,
-      fundingGoalMajor: Number(goal) || 0,
-      startDate: new Date().toISOString(),
-    });
-    router.push(`/org/campaigns/${campaign.id}`);
+    if (!organizationId || submitting) return;
+    setSubmitting(true);
+    try {
+      const { campaignId } = await createCampaign({
+        organizationId,
+        title,
+        description,
+        category,
+        location,
+        currency: baseCurrency,
+        fundingGoalMajor: Number(goal) || 0,
+      });
+      router.push(`/org/campaigns/${campaignId}`);
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   return (
@@ -73,15 +96,15 @@ export default function NewCampaignPage() {
           </div>
           <div className="space-y-1.5">
             <Label>Location</Label>
-            <Input value={location} onChange={(e) => setLocation(e.target.value)} required placeholder={org.operatingCountry} />
+            <Input value={location} onChange={(e) => setLocation(e.target.value)} required placeholder={operatingCountry} />
           </div>
         </div>
         <div className="space-y-1.5">
-          <Label>Funding goal ({org.baseCurrency})</Label>
+          <Label>Funding goal ({baseCurrency})</Label>
           <Input value={goal} onChange={(e) => setGoal(e.target.value.replace(/[^0-9]/g, ""))} required inputMode="numeric" />
         </div>
-        <Button type="submit" className="w-full">
-          Create campaign
+        <Button type="submit" className="w-full" disabled={submitting}>
+          {submitting ? "Creating…" : "Create campaign"}
         </Button>
       </form>
     </div>

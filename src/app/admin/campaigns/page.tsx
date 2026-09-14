@@ -1,19 +1,18 @@
-"use client";
-
 import Link from "next/link";
-import { campaigns, getOrganizationById } from "@/lib/data";
+import { getAllCampaignsForAdmin } from "@/lib/ngo-data";
 import { Money } from "@/components/shared/money";
 import { Progress } from "@/components/ui/progress";
 
-export default function AdminCampaignsPage() {
+export default async function AdminCampaignsPage() {
+  const campaigns = await getAllCampaignsForAdmin();
+
   return (
     <div>
       <h1 className="font-heading text-2xl font-semibold text-foreground">Campaigns</h1>
       <p className="text-sm text-muted-foreground">Every campaign across all organizations on GiveTrail.</p>
 
       <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {campaigns.map((c) => {
-          const org = getOrganizationById(c.organizationId);
+        {campaigns.map(({ campaign: c, organization: org }) => {
           const pct = c.fundingGoal > 0 ? Math.min(100, (c.amountRaised / c.fundingGoal) * 100) : 0;
           return (
             <Link

@@ -1,19 +1,15 @@
-"use client";
-
-import { use } from "react";
 import Link from "next/link";
-import { ChevronLeft } from "lucide-react";
-import { getGrantDetail } from "@/lib/data";
+import { ChevronLeft, HandCoins } from "lucide-react";
+import { getGrantDetail } from "@/lib/ngo-data";
 import { Money } from "@/components/shared/money";
 import { Progress } from "@/components/ui/progress";
 import { EmptyState } from "@/components/shared/empty-state";
-import { HandCoins } from "lucide-react";
 import { formatDate } from "@/lib/utils/format";
 import type { Currency } from "@/lib/types";
 
-export default function GrantDetailPage({ params }: { params: Promise<{ grantId: string }> }) {
-  const { grantId } = use(params);
-  const detail = getGrantDetail(grantId);
+export default async function GrantDetailPage({ params }: { params: Promise<{ grantId: string }> }) {
+  const { grantId } = await params;
+  const detail = await getGrantDetail(grantId);
 
   if (!detail) return <EmptyState icon={HandCoins} title="Grant not found" />;
   const { grant, organization, campaign, budgetVsActual } = detail;
