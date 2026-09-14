@@ -11,10 +11,10 @@ export default async function CheckoutPage({
   searchParams,
 }: {
   params: Promise<{ orgSlug: string }>;
-  searchParams: Promise<{ campaign?: string }>;
+  searchParams: Promise<{ campaign?: string; cancelled?: string }>;
 }) {
   const { orgSlug } = await params;
-  const { campaign } = await searchParams;
+  const { campaign, cancelled } = await searchParams;
   const organization = await getVerifiedOrganizationBySlug(orgSlug);
 
   if (!organization) {
@@ -44,6 +44,12 @@ export default async function CheckoutPage({
       <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6 lg:px-8">
         <p className="text-xs font-semibold uppercase tracking-wide text-primary">Donating to</p>
         <h1 className="mt-1 font-heading text-3xl font-semibold text-foreground">{organization.name}</h1>
+
+        {cancelled && (
+          <p className="mt-4 rounded-xl border border-warning/30 bg-[color-mix(in_oklab,var(--warning)_10%,var(--background))] px-4 py-3 text-sm text-foreground">
+            Your payment was cancelled — no charge was made. Feel free to try again below.
+          </p>
+        )}
 
         <div className="mt-10">
           <CheckoutForm organization={organization} campaigns={campaigns} preselectedCampaignId={campaign} platformFeePct={platformFeePct} />

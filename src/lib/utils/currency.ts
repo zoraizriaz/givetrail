@@ -50,3 +50,8 @@ export function formatPercent(fraction: number, digits = 0): string {
 export function toMinorUnits(major: number): number {
   return Math.round(major * 100);
 }
+
+/** Safepay only settles in PKR or USD — every other display currency routes through USD under the hood. */
+export function settlementCurrencyFor(preferred: Currency): "PKR" | "USD" {
+  return preferred === "PKR" ? "PKR" : "USD";
+}
