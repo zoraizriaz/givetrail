@@ -27,7 +27,7 @@ export default async function OrganizationProfilePage({ params }: { params: Prom
 
   return (
     <div>
-      <div className="trail-gradient-bg border-b border-border">
+      <div className="border-b border-border bg-muted/50">
         <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
           <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
             <div className="flex items-center gap-4">

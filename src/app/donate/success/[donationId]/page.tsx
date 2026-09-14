@@ -6,6 +6,7 @@ import { Money } from "@/components/shared/money";
 import { getDonationTrail, canViewDonation } from "@/lib/supabase-data";
 import { createClient } from "@/lib/supabase/server";
 import { PaymentStatusPoller } from "@/components/checkout/payment-status-poller";
+import { HeroGlow } from "@/components/home/hero-glow";
 
 export default async function DonationSuccessPage({ params }: { params: Promise<{ donationId: string }> }) {
   const { donationId } = await params;
@@ -37,9 +38,10 @@ export default async function DonationSuccessPage({ params }: { params: Promise<
   const isConfirmed = !isPending && !isFailed && !isRefunded;
 
   return (
-    <div className="min-h-screen trail-gradient-bg">
+    <div className="relative min-h-screen overflow-hidden bg-background">
+      <HeroGlow />
       <PaymentStatusPoller status={status} />
-      <header className="px-4 py-6 sm:px-6 lg:px-8">
+      <header className="relative px-4 py-6 sm:px-6 lg:px-8">
         <Logo markSize={26} />
       </header>
 

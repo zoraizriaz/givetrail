@@ -1,6 +1,7 @@
 import { SectionEyebrow } from "@/components/shared/money";
 import { ALL_CURRENCIES, CURRENCY_NAMES } from "@/lib/utils/currency";
 import { Globe2, Landmark, ShieldCheck } from "lucide-react";
+import { Reveal, RevealGroup, RevealItem } from "@/components/shared/reveal";
 
 const PILLARS = [
   {
@@ -23,25 +24,27 @@ const PILLARS = [
 export function GlobalVision() {
   return (
     <section className="border-y border-border bg-card/60">
-      <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-2xl text-center">
-          <SectionEyebrow className="justify-center flex">Global by design</SectionEyebrow>
-          <h2 className="mt-3 font-heading text-3xl font-semibold text-foreground sm:text-4xl">
-            One accounting standard for giving, everywhere
-          </h2>
-        </div>
+      <div className="mx-auto max-w-7xl px-4 py-24 sm:px-6 lg:px-8">
+        <Reveal>
+          <div className="mx-auto max-w-2xl text-center">
+            <SectionEyebrow className="justify-center flex">Global by design</SectionEyebrow>
+            <h2 className="mt-3 font-heading text-3xl font-medium text-foreground sm:text-4xl">
+              One accounting standard for giving, everywhere
+            </h2>
+          </div>
+        </Reveal>
 
-        <div className="mt-14 grid gap-6 md:grid-cols-3">
+        <RevealGroup className="mt-14 grid gap-6 md:grid-cols-3">
           {PILLARS.map((p) => (
-            <div key={p.title} className="rounded-2xl border border-border bg-background p-7">
-              <div className="flex size-11 items-center justify-center rounded-xl bg-accent text-accent-foreground">
-                <p.icon className="size-5" />
+            <RevealItem key={p.title} className="rounded-2xl border border-border bg-background p-7">
+              <div className="flex size-11 items-center justify-center rounded-xl border border-border text-foreground">
+                <p.icon className="size-5" strokeWidth={1.5} />
               </div>
               <h3 className="mt-4 font-heading text-lg font-semibold text-foreground">{p.title}</h3>
               <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{p.body}</p>
-            </div>
+            </RevealItem>
           ))}
-        </div>
+        </RevealGroup>
 
         <div className="mt-12 rounded-2xl border border-dashed border-border bg-background p-6">
           <p className="text-center text-xs font-semibold uppercase tracking-wide text-muted-foreground">Supported currencies</p>

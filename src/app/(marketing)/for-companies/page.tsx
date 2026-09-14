@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowRight, BarChart3, Building2, FileBarChart, Wallet } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SectionEyebrow } from "@/components/shared/money";
+import { HeroGlow } from "@/components/home/hero-glow";
 
 const FEATURES = [
   {
@@ -29,8 +30,9 @@ const FEATURES = [
 export default function ForCompaniesPage() {
   return (
     <div>
-      <div className="trail-gradient-bg border-b border-border">
-        <div className="mx-auto max-w-5xl px-4 py-20 text-center sm:px-6 lg:px-8">
+      <div className="relative overflow-hidden border-b border-border">
+        <HeroGlow />
+        <div className="relative mx-auto max-w-5xl px-4 py-20 text-center sm:px-6 lg:px-8">
           <SectionEyebrow className="justify-center flex">For Companies</SectionEyebrow>
           <h1 className="mt-3 font-heading text-4xl font-semibold text-foreground sm:text-5xl">
             Corporate philanthropy your board can actually see

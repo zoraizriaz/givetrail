@@ -29,11 +29,11 @@ export function AccountMenu() {
 
   if (!user) {
     return (
-      <div className="flex items-center gap-2">
-        <Button asChild variant="ghost" size="sm">
+      <div className="flex items-center gap-1">
+        <Button asChild variant="ghost" size="sm" className="rounded-full">
           <Link href="/login">Log in</Link>
         </Button>
-        <Button asChild size="sm">
+        <Button asChild size="sm" className="rounded-full">
           <Link href="/signup">Get started</Link>
         </Button>
       </div>

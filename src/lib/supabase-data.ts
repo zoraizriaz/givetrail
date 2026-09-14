@@ -500,4 +500,45 @@ export async function getSampleDonationTrail(): Promise<DonationTrail | undefine
   return fallback;
 }
 
+export interface PlatformStats {
+  currency: Currency;
+  totalTracked: number;
+  verifiedOrganizations: number;
+  countriesRepresented: number;
+  verifiedExpenditures: number;
+}
+
+/** Real, live platform-wide aggregates for the homepage stats section — never invented figures. */
+export async function getPlatformStats(): Promise<PlatformStats> {
+  const baseCurrency: Currency = "USD";
+  const admin = createAdminClient();
+
+  const [organizations, { data: donationRows }, { data: expenseRows }] = await Promise.all([
+    getVerifiedOrganizations(),
+    admin.from("donations").select("currency, amount_received_by_org, payments(status)"),
+    admin.from("expenses").select("verification_level"),
+  ]);
+
+  let totalTracked = 0;
+  for (const row of donationRows ?? []) {
+    const payment = Array.isArray(row.payments) ? row.payments[0] : row.payments;
+    if (!isSettled(payment?.status as PaymentStatus | undefined)) continue;
+    totalTracked += fxConvert(Number(row.amount_received_by_org), row.currency as Currency, baseCurrency);
+  }
+
+  const verifiedExpenditures = (expenseRows ?? []).filter(
+    (e) => e.verification_level && e.verification_level !== "declared"
+  ).length;
+
+  const countriesRepresented = new Set(organizations.map((o) => o.operatingCountry).filter(Boolean)).size;
+
+  return {
+    currency: baseCurrency,
+    totalTracked,
+    verifiedOrganizations: organizations.length,
+    countriesRepresented,
+    verifiedExpenditures,
+  };
+}
+
 export type { Allocation, Payment };

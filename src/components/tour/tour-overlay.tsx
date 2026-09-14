@@ -56,13 +56,13 @@ export function TourOverlay(tour: PageTourState) {
             left: rect.left - PADDING,
             width: rect.width + PADDING * 2,
             height: rect.height + PADDING * 2,
-            boxShadow: "0 0 0 9999px rgba(42, 33, 28, 0.6)",
+            boxShadow: "0 0 0 9999px rgba(23, 23, 23, 0.55)",
             outline: "2px solid var(--primary)",
             outlineOffset: "2px",
           }}
         />
       ) : (
-        <div className="fixed inset-0 bg-[rgba(42,33,28,0.6)]" onClick={skip} />
+        <div className="fixed inset-0 bg-[rgba(23,23,23,0.55)]" onClick={skip} />
       )}
 
       <div

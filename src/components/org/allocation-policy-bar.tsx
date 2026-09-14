@@ -3,8 +3,8 @@ import { formatPercent } from "@/lib/utils/currency";
 
 const SEGMENTS: { key: keyof AllocationPolicy; label: string; className: string }[] = [
   { key: "programPct", label: "Program services", className: "bg-primary" },
-  { key: "operationsPct", label: "Operations", className: "bg-[var(--trail-peach)]" },
-  { key: "fundraisingPct", label: "Fundraising", className: "bg-[var(--trail-mauve)]" },
+  { key: "operationsPct", label: "Operations", className: "bg-accent-peach" },
+  { key: "fundraisingPct", label: "Fundraising", className: "bg-accent-rose" },
   { key: "paymentProcessingPct", label: "Payment processing", className: "bg-muted-foreground/40" },
 ];
 

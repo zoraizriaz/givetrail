@@ -1,15 +1,17 @@
 import Link from "next/link";
 import { Logo } from "@/components/shared/logo";
+import { HeroGlow } from "@/components/home/hero-glow";
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex min-h-screen flex-1 flex-col trail-gradient-bg">
-      <header className="px-6 py-6">
+    <div className="relative flex min-h-screen flex-1 flex-col overflow-hidden bg-background">
+      <HeroGlow />
+      <header className="relative px-6 py-6">
         <Link href="/">
           <Logo />
         </Link>
       </header>
-      <main className="flex flex-1 items-center justify-center px-4 pb-16">{children}</main>
+      <main className="relative flex flex-1 items-center justify-center px-4 pb-16">{children}</main>
     </div>
   );
 }

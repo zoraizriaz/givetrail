@@ -10,12 +10,13 @@
   --font-sans: var(--font-sans);
   --font-mono: var(--font-geist-mono);
   --font-heading: var(--font-heading);
-  --color-trail-cream: var(--trail-cream);
-  --color-trail-blush: var(--trail-blush);
-  --color-trail-rose: var(--trail-rose);
-  --color-trail-peach: var(--trail-peach);
-  --color-trail-mauve: var(--trail-mauve);
-  --color-trail-brown: var(--trail-brown);
+  --color-accent-blush: var(--accent-blush);
+  --color-accent-coral: var(--accent-coral);
+  --color-accent-rose: var(--accent-rose);
+  --color-accent-champagne: var(--accent-champagne);
+  --color-accent-peach: var(--accent-peach);
+  --color-accent-lavender: var(--accent-lavender);
+  --color-accent-ice: var(--accent-ice);
   --color-success: var(--success);
   --color-success-foreground: var(--success-foreground);
   --color-warning: var(--warning);
@@ -59,95 +60,100 @@
 }
 
 :root {
-  /* GiveTrail brand — sampled directly from the GT ribbon mark (cream / blush / dusty rose / peach / mauve-brown) */
-  --trail-cream: #fdf7f1;
-  --trail-blush: #f3d3c4;
-  --trail-rose: #c48d86;
-  --trail-peach: #e7ad8c;
-  --trail-mauve: #9c7269;
-  --trail-brown: #5c3f34;
+  /* GiveTrail accents — refined, sparing versions of the GT ribbon-mark hues,
+     widened with two new quiet tones (lavender, ice) for the "spectral" glass
+     effect. These are used as thin accents (glows, hairlines, chart fills,
+     small status marks) — never as large solid section backgrounds. */
+  --accent-blush: #f3ded8;
+  --accent-coral: #e5a98c;
+  --accent-rose: #c99a8e;
+  --accent-champagne: #ecdcc0;
+  --accent-peach: #edc7a4;
+  --accent-lavender: #dcd6ea;
+  --accent-ice: #d2e2e8;
 
-  --background: #fbf6f0;
-  --foreground: #2a211c;
+  --background: #f7f7f4;
+  --foreground: #171717;
   --card: #ffffff;
-  --card-foreground: #2a211c;
+  --card-foreground: #171717;
   --popover: #ffffff;
-  --popover-foreground: #2a211c;
-  --primary: #b17862;
-  --primary-foreground: #fdf6f2;
-  --secondary: #f2ddc9;
-  --secondary-foreground: #4a3527;
-  --muted: #f3ebe1;
-  --muted-foreground: #83766c;
-  --accent: #f2d7c8;
-  --accent-foreground: #4a2e28;
-  --destructive: #af4438;
-  --success: #4d7a5f;
+  --popover-foreground: #171717;
+  --primary: #171717;
+  --primary-foreground: #fafaf8;
+  --secondary: #eeece5;
+  --secondary-foreground: #262626;
+  --muted: #f0f1ee;
+  --muted-foreground: #6b6b68;
+  --accent: #f3e7de;
+  --accent-foreground: #3a2e26;
+  --destructive: #b0463a;
+  --success: #48664f;
   --success-foreground: #f4faf6;
-  --warning: #b9803a;
+  --warning: #a97a3a;
   --warning-foreground: #fbf3e8;
-  --border: #e9ddd0;
-  --input: #e9ddd0;
-  --ring: #c99483;
+  --border: #e4e4e0;
+  --input: #e4e4e0;
+  --ring: #c9a98f;
   --chart-1: #b17862;
   --chart-2: #e0a97e;
   --chart-3: #9c7269;
-  --chart-4: #5c3f34;
+  --chart-4: #8891a3;
   --chart-5: #eec2ab;
-  --radius: 1rem;
-  --sidebar: #f7efe6;
-  --sidebar-foreground: #2a211c;
-  --sidebar-primary: #b17862;
-  --sidebar-primary-foreground: #fdf6f2;
-  --sidebar-accent: #f2ddc9;
-  --sidebar-accent-foreground: #4a3527;
-  --sidebar-border: #e9ddd0;
-  --sidebar-ring: #c99483;
+  --radius: 0.8rem;
+  --sidebar: #f4f4f1;
+  --sidebar-foreground: #171717;
+  --sidebar-primary: #171717;
+  --sidebar-primary-foreground: #fafaf8;
+  --sidebar-accent: #eeece5;
+  --sidebar-accent-foreground: #262626;
+  --sidebar-border: #e4e4e0;
+  --sidebar-ring: #c9a98f;
 }
 
 .dark {
-  --trail-cream: #2a211c;
-  --trail-blush: #3c2e28;
-  --trail-rose: #d6a196;
-  --trail-peach: #e0aa80;
-  --trail-mauve: #b78f83;
-  --trail-brown: #d9beae;
+  --accent-blush: #3a2e2a;
+  --accent-coral: #c98d6e;
+  --accent-rose: #b78f83;
+  --accent-champagne: #3a3226;
+  --accent-peach: #c99464;
+  --accent-lavender: #34324a;
+  --accent-ice: #2a3a42;
 
-  --background: #211a16;
-  --foreground: #f3e9df;
-  --card: #291f1a;
-  --card-foreground: #f3e9df;
-  --popover: #291f1a;
-  --popover-foreground: #f3e9df;
-  --primary: #d19c85;
-  --primary-foreground: #241a16;
-  --secondary: #3a2c24;
-  --secondary-foreground: #f3e9df;
-  --muted: #33271f;
-  --muted-foreground: #baa495;
-  --accent: #3c2e28;
-  --accent-foreground: #f3e9df;
+  --background: #141414;
+  --foreground: #f2f2ef;
+  --card: #1a1a1a;
+  --card-foreground: #f2f2ef;
+  --popover: #1a1a1a;
+  --popover-foreground: #f2f2ef;
+  --primary: #f2f2ef;
+  --primary-foreground: #171717;
+  --secondary: #262624;
+  --secondary-foreground: #f2f2ef;
+  --muted: #212120;
+  --muted-foreground: #9a9a95;
+  --accent: #2b2521;
+  --accent-foreground: #f2f2ef;
   --destructive: #d97463;
   --success: #7fae91;
   --success-foreground: #16261c;
   --warning: #dba86a;
   --warning-foreground: #2b2010;
-  --border: rgba(243, 233, 223, 0.12);
-  --input: rgba(243, 233, 223, 0.14);
-  --ring: #c99483;
+  --border: rgba(242, 242, 239, 0.12);
+  --input: rgba(242, 242, 239, 0.14);
+  --ring: #c9a98f;
   --chart-1: #d19c85;
   --chart-2: #e0aa80;
   --chart-3: #b78f83;
-  --chart-4: #d9beae;
+  --chart-4: #8891a3;
   --chart-5: #f0c6ac;
-  --sidebar: #241b17;
-  --sidebar-foreground: #f3e9df;
-  --sidebar-primary: #d19c85;
-  --sidebar-primary-foreground: #241a16;
-  --sidebar-accent: #3a2c24;
-  --sidebar-accent-foreground: #f3e9df;
-  --sidebar-border: rgba(243, 233, 223, 0.12);
-  --sidebar-ring: #c99483;
+  --sidebar: #191919;
+  --sidebar-foreground: #f2f2ef;
+  --sidebar-primary: #f2f2ef;
+  --sidebar-primary-foreground: #171717;
+  --sidebar-accent: #262624;
+  --sidebar-accent-foreground: #f2f2ef;
+  --sidebar-border: rgba(242, 242, 239, 0.12);
+  --sidebar-ring: #c9a98f;
 }
 
 @layer base {
@@ -163,27 +169,62 @@
 }
 
 @layer utilities {
+  /* A very low-opacity spectral wash — atmosphere, not a section background.
+     Use at low opacity (≤12%) behind content, never as a solid fill. */
   .trail-gradient-bg {
     background: linear-gradient(
       120deg,
-      var(--trail-cream) 0%,
-      var(--trail-blush) 38%,
-      var(--trail-rose) 72%,
-      var(--trail-peach) 100%
+      var(--accent-champagne) 0%,
+      var(--accent-blush) 35%,
+      var(--accent-lavender) 70%,
+      var(--accent-ice) 100%
     );
   }
   .trail-gradient-text {
-    background: linear-gradient(
-      100deg,
-      var(--trail-brown) 0%,
-      var(--trail-rose) 55%,
-      var(--trail-peach) 100%
-    );
+    background: linear-gradient(100deg, var(--accent-coral) 0%, var(--accent-rose) 55%, var(--accent-champagne) 100%);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
   }
   .trail-card-shadow {
-    box-shadow: 0 1px 2px rgba(107, 79, 66, 0.04), 0 8px 24px -8px rgba(107, 79, 66, 0.12);
+    box-shadow:
+      0 1px 2px rgba(23, 23, 23, 0.04),
+      0 12px 32px -12px rgba(23, 23, 23, 0.08);
+  }
+  /* Ambient blurred blob — the site's one recurring "soft form" atmospheric
+     element. Sized and positioned per-usage; this utility only sets material. */
+  .trail-glow {
+    background: radial-gradient(
+      circle at 35% 30%,
+      color-mix(in oklab, var(--accent-ice) 55%, transparent) 0%,
+      color-mix(in oklab, var(--accent-lavender) 45%, transparent) 35%,
+      color-mix(in oklab, var(--accent-blush) 35%, transparent) 60%,
+      transparent 80%
+    );
+    filter: blur(60px);
+  }
+
+  /* Pure-CSS entrance for above-the-fold content (hero). Plays immediately on
+     paint via the browser's own animation engine — unlike a JS/whileInView
+     reveal, it never depends on hydration finishing, so first paint is never
+     stuck at opacity:0 on a slow connection or in dev mode. */
+  .hero-in {
+    animation: hero-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation-delay: var(--hero-in-delay, 0s);
+  }
+  @keyframes hero-in {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hero-in {
+      animation: none;
+    }
   }
 }
